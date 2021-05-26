@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.54.0/dist/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@samme/colors@1.2.0/dist/colors.umd.js"></script>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script>
+
+    </script>
+
+<script>
+    var text, timer;
+    var cssColors = colors.cssColors;
+    var currentHealth = 100;
+    var maxHealth = 100;
+    connected = 0;
+    userConnected = null;
+    timedEvent = null;
+    augmente = 0;
+    positif = 0;
+    screenCenterX = 0;
+    screenCenterY = 0;
+    textMenu = 'brown';
+    firebaseApp = null;
+
+
+    window.onload = function() {
+        var config = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 800,
+                height: 600
+            },
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 200 }
+                }
+            },
+            scene: [MainScene, niveau1]
+        };
+
+        game= new Phaser.Game(config);
+        game.scene.start("MainScene");
+    };
+
+    class MainScene extends Phaser.Scene{
+
+        constructor(){
+            super({key: 'MainScene' });
+        }
+        preload () {
+            this.load.image('decors', 'assets/images/decors/street.png');
+
+        }
+        create () {
+
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyCbHGEAhnqMtcJbpYU9jdjqc75bnGO23-Y",
+                authDomain: "wanted-314813.firebaseapp.com",
+                projectId: "wanted-314813",
+                storageBucket: "wanted-314813.appspot.com",
+                messagingSenderId: "348028017682",
+                appId: "1:348028017682:web:3d771c865cd77e62c00ccb"
+            };
+            // Initialize Firebase
+            if( firebaseApp == null )
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+
+
+            const decors = this.add.image(400, 300, 'decors');
+            this.tweens.add({
+                targets: decors,
+                x: 100,
+                ease: 'Sine.easeInOut',
+                yoyo: false,
+                repeat: 0,
+                duration: 3000
+            });
+
+            this.cameras.main.fadeIn(3000);
+
+            screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+            screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+            //firebaseApp.auth().signOut();
+            firebaseApp.auth().onAuthStateChanged(function (user) {
+                if (user) {
+
+                    userConnected = firebase.auth().currentUser;
+
+
+                    connected = 1;
+                    // User is signed in.
+                    var displayName = user.displayName;
+                    var email = user.email;
+                    var emailVerified = user.emailVerified;
+                    var photoURL = user.photoURL;
+                    var isAnonymous = user.isAnonymous;
+                    var uid = user.uid;
+                    var providerData = user.providerData;
+                    //console.log(displayName + '(' + uid + '): ' + email);
+                }
+            });
+
+            this.cameras.main.on('camerafadeoutcomplete', function () {
+
+                this.scene.start("niveau1");
+
+            }, this);
+
+            this.time.addEvent({
+                delay: 3000,                // ms
+                callback: ()=>{
+                    if( userConnected != null) {
+                        this.clickButton = this.add.text(screenCenterX - 70, screenCenterY, 'JOUER', {fill: 'brown', font: 'bold 52px system-ui'})
+                            .setInteractive()
+                            .on('pointerdown', () => this.passLevel1())
+                            .on('pointerover', () => this.enterButtonHoverState(this.clickButton))
+                            .on('pointerout', () => this.enterButtonRestState(this.clickButton));
+
+                        this.clickButton2 = this.add.text(screenCenterX - 170, screenCenterY + 70, 'SE DECONNECTER', {fill: 'brown', font: 'bold 52px system-ui'})
+                            .setInteractive()
+                            .on('pointerdown', () => this.deconnect(this.scene))
+                            .on('pointerover', () => this.enterButtonHoverState(this.clickButton2))
+                            .on('pointerout', () => this.enterButtonRestState(this.clickButton2));
+                    }else{
+                        this.clickButton3 = this.add.text(screenCenterX /2, screenCenterY, 'SE CONNECTER', {fill: 'brown', font: 'bold 52px system-ui'})
+                            .setInteractive()
+                            .on('pointerdown', () => this.connect(this.scene))
+                            .on('pointerover', () => this.enterButtonHoverState(this.clickButton3))
+                            .on('pointerout', () => this.enterButtonRestState(this.clickButton3));
+
+                    }
+                },
+                //args: [],
+                callbackScope: this,
+                loop: false
+            });
+
+        }
+        update () {
+
+        }
+
+        deconnect(sceneContext) {
+            firebaseApp.auth().signOut();
+            userConnected = null;
+            sceneContext.restart();
+        }
+
+        connect(sceneContext) {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebaseApp.auth().signInWithPopup(provider).then(function (result) {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                var token = result.credential.accessToken;
+                // The signed-in user info.
+                var user = result.user;
+                // ...
+                if( user != null ) {
+                    sceneContext.restart();
+                }
+            }).catch(function (error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+                // ...
+
+                console.log(errorMessage);
+            });
+        }
+
+        passLevel1() {
+
+            //  Get a random color
+            var red = Phaser.Math.Between(50, 255);
+            var green = Phaser.Math.Between(50, 255);
+            var blue = Phaser.Math.Between(50, 255);
+
+            this.cameras.main.fade(2000, red, green, blue);
+        }
+
+        enterButtonHoverState(button) {
+            //textMenu = '#ff0';
+            button.setStyle({ fill: '#ff0'});
+        }
+
+        enterButtonRestState(button) {
+            //textMenu = 'brown';
+            button.setStyle({ fill: 'brown'});
+        }
+    }
+
+
+    class niveau1 extends Phaser.Scene {
+        constructor() {
+            super({
+                key: 'niveau1'
+            });
+        }
+
+        preload() {
+
+            this.load.plugin('rexfadeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfadeplugin.min.js', true);
+            this.load.plugin('rexfirebaseplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfirebaseplugin.min.js', true);
+
+            this.load.setBaseURL('http://labs.phaser.io');
+
+            this.load.image('sky', 'assets/skies/space3.png');
+            this.load.image('logo', 'assets/sprites/phaser3-logo.png');
+            this.load.image('red', 'assets/particles/red.png');
+            this.load.image('fire', 'assets/particles/lit-smoke.png');
+            this.load.image('tete1', 'http://wanted.local/assets/images/tetes/tete_1.png');
+            this.load.image('tete2', 'http://wanted.local/assets/images/tetes/tete_2.png');
+            this.load.spritesheet('button', 'http://wanted.local/assets/buttons/button_sprite_sheet.png', {
+                frameWidth: 193,
+                frameHeight: 71
+            });
+            augmente = 0;
+            positif = 1;
+
+        }
+
+        create() {
+
+            //firebaseApp.auth().signOut();//se deconnecter
+
+            //userlist je ne sais pas le faire marcher, le tableau renvoyé est vide
+            //var userList = this.plugins.get('rexfirebaseplugin').add.onlineUserList(config);
+            //var users = userList.getUsers();
+            //console.log(users);
+            //////////////////////////end of login
+
+            var decor = this.add.image(400, 300, 'sky');
+            decor.setInteractive();
+            decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
+                this.time.addEvent({callback: badClick, callbackScope: this});
+            });
+
+
+            var particles = this.add.particles('red');
+            this.particlesFind = this.add.particles('fire');
+
+            var emitter = particles.createEmitter({
+                speed: 100,
+                scale: {start: 1, end: 0},
+                blendMode: 'ADD'
+            });
+
+            var logo = this.physics.add.image(400, 100, 'logo');
+
+            logo.setVelocity(100, 200);
+            logo.setBounce(1, 1);
+            logo.setCollideWorldBounds(true);
+
+            emitter.startFollow(logo);
+
+            var nbTetes = game.config.width / 50;
+
+
+            this.tetes = new Array();
+            this.tetesDepartX = new Array();
+            this.tetesDepartY = new Array();
+
+
+            this.tete2 = this.add.image(game.config.width - 150, 150, 'tete2');
+            this.tete2.setInteractive();
+
+            this.tete2.on('pointerdown', () => {        //quand on clique sur l'élément recherché
+                this.time.addEvent({callback: actionOnClick, callbackScope: this});
+            });
+
+
+            for (var a = -nbTetes; a < nbTetes; a++) {
+                for (var i = 0; i < 45; i++) {
+                    var imgFalse = this.add.image(a * 50, 50 + (i * 50), 'tete1');
+
+                    var value = Phaser.Math.Between(0, 10);
+                    if (value < 5)
+                        imgFalse.rotation += 0.6;
+
+                    this.tetes.push(imgFalse);
+                    this.tetesDepartX.push(a * 50);
+                    this.tetesDepartY.push(50 + (i * 50));
+
+                    var imgFalse = this.add.image(a * 50, 50 + (-i * 50), 'tete1');
+
+                    var value = Phaser.Math.Between(0, 10);
+                    if (value < 5)
+                        imgFalse.rotation += 0.6;
+
+                    this.tetes.push(imgFalse);
+                    this.tetesDepartX.push(a * 50);
+                    this.tetesDepartY.push(50 + (-i * 50));
+                }
+            }
+
+            //timer
+
+            //  So we can see how much health we have left
+            text = this.add.text(10, 10, ' 100', {fill: cssColors.aqua, font: 'bold 52px system-ui'})
+                .setShadow(2, 2, cssColors.navy, 8);
+
+            timedEvent = this.time.addEvent({delay: 1000, callback: reduceHealth, callbackScope: this, loop: true});
+
+
+            /*
+        this.input.on('pointerdown', function () {
+            timedEvent.paused = !timedEvent.paused;
+        });
+        */
+
+        }
+
+
+        update() {
+            if( currentHealth == 0) {
+                this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', {
+                    fontSize: '32px',
+                    fill: '#fff'
+                });
+                this.tete2.destroy();
+
+            }
+
+            text.setText(currentHealth).setShadow(2, 2, cssColors.navy, 8);
+
+           // console.log(userConnected, 'joachim');
+            this.tete2.rotation += 0.01;
+            for (var i = 0; i < this.tetes.length; i++) {
+                var tete = this.tetes[i];
+                if( currentHealth == 0)
+                    tete.destroy();
+                else {
+                    if (tete.rotation != 0)
+                        tete.rotation += 0.1;
+
+                    var tetesDepartX = this.tetesDepartX[i];
+                    var tetesDepartY = this.tetesDepartY[i];
+
+
+                    tete.x += 2;
+                    if (positif == 3)//donc jamais car normalement c'est 1 pour faire sinusoidale
+                        tete.y += 2;
+                    else
+                        tete.y -= 2;
+
+                    if (tete.x > 800 + tetesDepartX) {
+                        tete.x = tetesDepartX;
+                        tete.y = tetesDepartY;
+                    }
+                }
+            }
+
+
+            this.tete2.x -= 3;
+            if (positif == 1)
+                this.tete2.y += 2;
+            else
+                this.tete2.y -= 2;
+
+            if (this.tete2.x < 0) {
+                this.tete2.x = game.config.width - 50;
+                var value = Phaser.Math.Between(0, 600);
+                this.tete2.y = value;
+            }
+
+
+            if (positif == 1)
+                augmente++;
+
+            if (positif == 0)
+                augmente--;
+
+            if (augmente >= 65)
+                positif = 0;
+
+
+            if (augmente <= -60)
+                positif = 1;
+
+        }
+    }
+
+    function reduceHealth ()
+    {
+        currentHealth--;
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            text.setText('Health: RIP');
+
+            //  Stop the timer
+            timedEvent.remove();
+        }
+    }
+
+    function badClick ()
+    {
+        currentHealth = currentHealth-10;
+
+        text.setFill('red');
+
+        this.time.addEvent({
+            delay: 200,
+            callback: ()=>{
+                text.setFill(cssColors.aqua);
+            },
+            loop: false
+        });
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            text.setText('Health: RIP');
+
+            //  Stop the timer
+            timedEvent.remove();
+        }
+    }
+
+    function actionOnClick () {
+        var findSpark = this.particlesFind.createEmitter({
+            speed: 100,
+            scale: { start: 1, end: 0 },
+            blendMode: 'ADD'
+        });
+        findSpark.startFollow(this.tete2);
+        this.tete2.visible = false;
+
+        //this.plugins.get('rexfadeplugin').fadeOutDestroy(findSpark, 500);
+
+
+        this.time.addEvent({
+            delay: 500,
+            callback: ()=>{
+                findSpark.on = false;
+                this.tete2.visible = true;
+                this.tete2.x= game.config.width-50;
+                var value = Phaser.Math.Between(0, 600);
+                this.tete2.y= value;
+            },
+            loop: false
+        });
+
+        //add 10 au temps
+        currentHealth = Phaser.Math.MaxAdd(currentHealth, 10, maxHealth);
+
+        text.setFill('green');
+
+        this.time.addEvent({
+            delay: 200,
+            callback: ()=>{
+                text.setFill(cssColors.aqua);
+            },
+            loop: false
+        });
+
+    }
+</script>
+</head>
+<body>
+
+</body>
+
+<!-- <script src="main.js" type = "module" ></script> -->
+</html>
