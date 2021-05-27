@@ -17,19 +17,22 @@
     </script>
 
 <script>
-    var text, timer;
-    var cssColors = colors.cssColors;
-    var currentHealth = 100;
-    var maxHealth = 100;
-    connected = 0;
-    userConnected = null;
-    timedEvent = null;
-    augmente = 0;
-    positif = 0;
-    screenCenterX = 0;
-    screenCenterY = 0;
-    textMenu = 'brown';
-    firebaseApp = null;
+    var text, timer, nextLevelText;
+    var cssColors        = colors.cssColors;
+    var currentHealth    = 100;
+    var maxHealth        = 100;
+    userConnected        = null;
+    timedEvent           = null;
+    augmente             = 0;
+    positif              = 0;
+    screenCenterX        = 0;
+    screenCenterY        = 0;
+    nextLevel            = 0;
+    textMenu             = 'brown';
+    firebaseApp          = null;
+    database             = null;
+    userInBdd            = null;
+    levelNiveau          = 0;
 
 
     window.onload = function() {
@@ -39,7 +42,7 @@
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
                 width: 800,
-                height: 600
+                height: 814//600
             },
             physics: {
                 default: 'arcade',
@@ -47,14 +50,15 @@
                     gravity: { y: 200 }
                 }
             },
-            scene: [MainScene, niveau1]
+            scene: [MainScene, jeu, map]
         };
 
         game= new Phaser.Game(config);
-        game.scene.start("MainScene");
+        //game.scene.start("MainScene");
+        //game.scene.start("map");
     };
 
-    class MainScene extends Phaser.Scene{
+    class MainScene extends Phaser.Scene    {
 
         constructor(){
             super({key: 'MainScene' });
@@ -69,6 +73,7 @@
             var firebaseConfig = {
                 apiKey: "AIzaSyCbHGEAhnqMtcJbpYU9jdjqc75bnGO23-Y",
                 authDomain: "wanted-314813.firebaseapp.com",
+                databaseURL: "https://wanted-314813-default-rtdb.europe-west1.firebasedatabase.app",
                 projectId: "wanted-314813",
                 storageBucket: "wanted-314813.appspot.com",
                 messagingSenderId: "348028017682",
@@ -78,6 +83,7 @@
             if( firebaseApp == null )
                 firebaseApp = firebase.initializeApp(firebaseConfig);
 
+            database =  firebase.database();
 
             const decors = this.add.image(400, 300, 'decors');
             this.tweens.add({
@@ -99,8 +105,6 @@
 
                     userConnected = firebase.auth().currentUser;
 
-
-                    connected = 1;
                     // User is signed in.
                     var displayName = user.displayName;
                     var email = user.email;
@@ -115,7 +119,7 @@
 
             this.cameras.main.on('camerafadeoutcomplete', function () {
 
-                this.scene.start("niveau1");
+                this.scene.start("map");
 
             }, this);
 
@@ -125,7 +129,7 @@
                     if( userConnected != null) {
                         this.clickButton = this.add.text(screenCenterX - 70, screenCenterY, 'JOUER', {fill: 'brown', font: 'bold 52px system-ui'})
                             .setInteractive()
-                            .on('pointerdown', () => this.passLevel1())
+                            .on('pointerdown', () => this.passMap())
                             .on('pointerover', () => this.enterButtonHoverState(this.clickButton))
                             .on('pointerout', () => this.enterButtonRestState(this.clickButton));
 
@@ -184,7 +188,25 @@
             });
         }
 
-        passLevel1() {
+        passMap() {
+            const dbRef = firebase.database().ref();
+            dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
+                if (snapshot.exists()) {
+                    userInBdd = snapshot.val();
+                } else {
+                    //on créé l'utilisateur
+                    writeUserData(
+                        userConnected.uid,
+                        userConnected.displayName,
+                        userConnected.email,
+                        userConnected.photoURL,
+                        0
+                    );
+                    userInBdd = userConnected;
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
 
             //  Get a random color
             var red = Phaser.Math.Between(50, 255);
@@ -205,11 +227,91 @@
         }
     }
 
+    //STORE-UPDATE DATABASE USER
+    function writeUserData(userId, name, email, imageUrl, level) {
+        firebase.database().ref('users/' + userId).set({
+            username: name,
+            email: email,
+            level: level,
+            profile_picture : imageUrl
+        });
+    }
 
-    class niveau1 extends Phaser.Scene {
+
+    class map extends Phaser.Scene {
         constructor() {
             super({
-                key: 'niveau1'
+                key: 'map'
+            });
+        }
+
+        preload() {
+            this.load.image('map', 'http://wanted.local/assets/images/map/map.png');
+            this.load.image('tete_map', 'http://wanted.local/assets/images/map/tete_map.png');
+        }
+
+        create() {
+            var decor = this.add.image(game.config.width/2, game.config.height/2, 'map');
+
+            for (var i = 0; i <= userInBdd.level; i++){
+                if( i == 0)
+                    this.pointMap0 = this.add.image(game.config.width/2 - 10, game.config.height - 120, 'tete_map')
+                        .setInteractive()
+                        .on('pointerdown', () => {levelNiveau = 0; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                        .on('pointerover', () => this.enterPointHoverState(this.pointMap0))
+                        .on('pointerout', () => this.enterPointRestState(this.pointMap0));
+                if( i == 1)
+                    this.pointMap1 = this.add.image(game.config.width/1.5 + 20 , game.config.height - 160, 'tete_map')
+                        .setInteractive()
+                        .on('pointerdown', () => {levelNiveau = 1; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                        .on('pointerover', () => this.enterPointHoverState(this.pointMap1))
+                        .on('pointerout', () => this.enterPointRestState(this.pointMap1));
+                if( i == 2)
+                    this.pointMap2 = this.add.image(game.config.width/2  + 30, game.config.height - 190, 'tete_map')
+                        .setInteractive()
+                        .on('pointerdown', () => {levelNiveau = 2; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                        .on('pointerover', () => this.enterPointHoverState(this.pointMap2))
+                        .on('pointerout', () => this.enterPointRestState(this.pointMap2));
+                if( i == "3")
+                    this.pointMap3 = this.add.image(game.config.width/2 -40, game.config.height - 240, 'tete_map')
+                        .setInteractive()
+                        .on('pointerdown', () => {levelNiveau = 3; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                        .on('pointerover', () => this.enterPointHoverState(this.pointMap3))
+                        .on('pointerout', () => this.enterPointRestState(this.pointMap3));
+                if( i == "4")
+                        this.pointMap4 = this.add.image(game.config.width/3 - 40, game.config.height - 260, 'tete_map')
+                            .setInteractive()
+                            .on('pointerdown', () => {levelNiveau = 4; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                            .on('pointerover', () => this.enterPointHoverState(this.pointMap4))
+                            .on('pointerout', () => this.enterPointRestState(this.pointMap4));
+                if( i == "5")
+                    this.pointMap5 = this.add.image(game.config.width/2 -25, game.config.height - 320, 'tete_map')
+                        .setInteractive()
+                        .on('pointerdown', () => {levelNiveau = 5; currentHealth = 100; nextLevel = 0; this.scene.start("jeu")})
+                        .on('pointerover', () => this.enterPointHoverState(this.pointMap5))
+                        .on('pointerout', () => this.enterPointRestState(this.pointMap5));
+            }
+
+
+        }
+
+        update() {
+
+        }
+
+        enterPointHoverState(button) {
+            button.rotation += 0.6;
+        }
+
+        enterPointRestState(button) {
+            button.rotation = 0;
+        }
+    }
+
+    class jeu extends Phaser.Scene {
+        constructor() {
+            super({
+                key: 'jeu'
             });
         }
 
@@ -224,8 +326,8 @@
             this.load.image('logo', 'assets/sprites/phaser3-logo.png');
             this.load.image('red', 'assets/particles/red.png');
             this.load.image('fire', 'assets/particles/lit-smoke.png');
-            this.load.image('tete1', 'http://wanted.local/assets/images/tetes/tete_1.png');
-            this.load.image('tete2', 'http://wanted.local/assets/images/tetes/tete_2.png');
+            this.load.image('tete1', 'http://wanted.local/assets/images/tetes/tete1_mini.png');
+            this.load.image('tete2', 'http://wanted.local/assets/images/tetes/tete2_mini.png');
             this.load.spritesheet('button', 'http://wanted.local/assets/buttons/button_sprite_sheet.png', {
                 frameWidth: 193,
                 frameHeight: 71
@@ -287,25 +389,32 @@
 
             for (var a = -nbTetes; a < nbTetes; a++) {
                 for (var i = 0; i < 45; i++) {
-                    var imgFalse = this.add.image(a * 50, 50 + (i * 50), 'tete1');
+                    var imgFalse = this.add.image(a * 80, 80 + (i * 80), 'tete1');
 
                     var value = Phaser.Math.Between(0, 10);
+                    var sens = Phaser.Math.Between(0, 10);
                     if (value < 5)
                         imgFalse.rotation += 0.6;
+                    if (sens < 5)
+                        imgFalse.sens = 'negatif';
 
                     this.tetes.push(imgFalse);
-                    this.tetesDepartX.push(a * 50);
-                    this.tetesDepartY.push(50 + (i * 50));
+                    this.tetesDepartX.push(a * 80);
+                    this.tetesDepartY.push(80 + (i * 80));
 
-                    var imgFalse = this.add.image(a * 50, 50 + (-i * 50), 'tete1');
+                    var imgFalse = this.add.image(a * 80, 80 + (-i * 80), 'tete1');
 
                     var value = Phaser.Math.Between(0, 10);
+                    var sens = Phaser.Math.Between(0, 10);
                     if (value < 5)
                         imgFalse.rotation += 0.6;
+                    if (sens < 5)
+                        imgFalse.sens = 'negatif';
+
 
                     this.tetes.push(imgFalse);
-                    this.tetesDepartX.push(a * 50);
-                    this.tetesDepartY.push(50 + (-i * 50));
+                    this.tetesDepartX.push(a * 80);
+                    this.tetesDepartY.push(80 + (-i * 80));
                 }
             }
 
@@ -315,14 +424,10 @@
             text = this.add.text(10, 10, ' 100', {fill: cssColors.aqua, font: 'bold 52px system-ui'})
                 .setShadow(2, 2, cssColors.navy, 8);
 
+            nextLevelText = this.add.text(this.cameras.main.width -150, 10, nextLevel, {fill: cssColors.aqua, font: 'bold 52px system-ui'})
+                .setShadow(2, 2, cssColors.navy, 8);
+
             timedEvent = this.time.addEvent({delay: 1000, callback: reduceHealth, callbackScope: this, loop: true});
-
-
-            /*
-        this.input.on('pointerdown', function () {
-            timedEvent.paused = !timedEvent.paused;
-        });
-        */
 
         }
 
@@ -336,6 +441,16 @@
                 this.tete2.destroy();
 
             }
+            if( nextLevel == 10) {
+                this.add.text(game.config.width / 2, game.config.height / 2, 'NEXT LEVEL', {
+                    fontSize: '32px',
+                    fill: '#fff'
+                }).setInteractive()
+                    .on('pointerdown', () => this.scene.start("map"));
+                this.tete2.destroy();
+                timedEvent.remove();
+
+            }
 
             text.setText(currentHealth).setShadow(2, 2, cssColors.navy, 8);
 
@@ -343,11 +458,15 @@
             this.tete2.rotation += 0.01;
             for (var i = 0; i < this.tetes.length; i++) {
                 var tete = this.tetes[i];
-                if( currentHealth == 0)
+                if( currentHealth == 0 || nextLevel == 10)
                     tete.destroy();
                 else {
-                    if (tete.rotation != 0)
-                        tete.rotation += 0.1;
+                    if (tete.rotation != 0) {
+                            if( tete.sens == 'negatif' )
+                                tete.rotation-= 0.1;
+                            else
+                                tete.rotation+= 0.1;
+                    }
 
                     var tetesDepartX = this.tetesDepartX[i];
                     var tetesDepartY = this.tetesDepartY[i];
@@ -367,7 +486,7 @@
             }
 
 
-            this.tete2.x -= 3;
+            this.tete2.x -= 3 + levelNiveau;
             if (positif == 1)
                 this.tete2.y += 2;
             else
@@ -403,8 +522,6 @@
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            text.setText('Health: RIP');
-
             //  Stop the timer
             timedEvent.remove();
         }
@@ -427,7 +544,6 @@
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            text.setText('Health: RIP');
 
             //  Stop the timer
             timedEvent.remove();
@@ -442,6 +558,20 @@
         });
         findSpark.startFollow(this.tete2);
         this.tete2.visible = false;
+        nextLevel++;
+        nextLevelText.setText(nextLevel).setShadow(2, 2, cssColors.navy, 8);
+        if( nextLevel == 10) {
+            userInBdd.level++;
+            //UPDATE LEVEL JOUEUR
+            writeUserData(
+                userConnected.uid,
+                userConnected.displayName,
+                userConnected.email,
+                userConnected.photoURL,
+                userInBdd.level
+            );
+
+        }
 
         //this.plugins.get('rexfadeplugin').fadeOutDestroy(findSpark, 500);
 
