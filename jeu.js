@@ -17,8 +17,10 @@
             this.load.image('logo', 'assets/sprites/phaser3-logo.png');
             this.load.image('red', 'assets/particles/red.png');
             this.load.image('fire', 'assets/particles/lit-smoke.png');
+            this.load.image('particuleDollars', 'assets/particles/flame1.png');
             this.load.image('tete1', 'http://wanted.local/assets/images/tetes/tete1_mini.png');
             this.load.image('tete2', 'http://wanted.local/assets/images/tetes/tete2_mini.png');
+            this.load.image('dollars', 'http://wanted.local/assets/images/tetes/dollars.png');
             this.load.spritesheet('button', 'http://wanted.local/assets/buttons/button_sprite_sheet.png', {
                 frameWidth: 193,
                 frameHeight: 71
@@ -29,6 +31,11 @@
         }
 
         create() {
+
+            //on passe par la pour les dollars car il ne doit pas réapparaitre tout de suite
+            this.emitterEventDollars = new Phaser.Events.EventEmitter();
+            this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
+
             var decor = this.add.image(400, 300, 'sky');
             decor.setInteractive();
             decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
@@ -38,8 +45,15 @@
 
             var particles = this.add.particles('red');
             this.particlesFind = this.add.particles('fire');
+            this.particlesDollars = this.add.particles('particuleDollars');
 
             var emitter = particles.createEmitter({
+                speed: 100,
+                scale: {start: 1, end: 0},
+                blendMode: 'ADD'
+            });
+
+            this.emitterDollars = this.particlesDollars.createEmitter({
                 speed: 100,
                 scale: {start: 1, end: 0},
                 blendMode: 'ADD'
@@ -57,8 +71,6 @@
 
 
             this.tetes = new Array();
-            this.tetesDepartX = new Array();
-            this.tetesDepartY = new Array();
 
 
             this.tete2 = this.add.image(game.config.width - 150, 150, 'tete2');
@@ -67,6 +79,16 @@
             this.tete2.on('pointerdown', () => {        //quand on clique sur l'élément recherché
                 this.time.addEvent({callback: actionOnClick, callbackScope: this});
             });
+
+
+            this.dollars = this.add.image(game.config.width - 150, 150, 'dollars');
+            this.dollars.setInteractive();
+
+            this.dollars.on('pointerdown', () => {        //quand on clique sur l'élément recherché
+                this.time.addEvent({callback: actionDollars, callbackScope: this});
+            });
+
+            this.emitterDollars.startFollow(this.dollars);
 
 
             for (var a = -nbTetes; a < nbTetes; a++) {
@@ -80,9 +102,10 @@
                     if (sens < 5)
                         imgFalse.sens = 'negatif';
 
+                    imgFalse.departX = a * 80;
+                    imgFalse.departY = 80 + (i * 80);
+
                     this.tetes.push(imgFalse);
-                    this.tetesDepartX.push(a * 80);
-                    this.tetesDepartY.push(80 + (i * 80));
 
                     var imgFalse = this.add.image(a * 80, 80 + (-i * 80), 'tete1');
 
@@ -93,10 +116,9 @@
                     if (sens < 5)
                         imgFalse.sens = 'negatif';
 
-
+                    imgFalse.departX = a * 80;
+                    imgFalse.departY = 80 + (-i * 80);
                     this.tetes.push(imgFalse);
-                    this.tetesDepartX.push(a * 80);
-                    this.tetesDepartY.push(80 + (-i * 80));
                 }
             }
 
@@ -113,9 +135,9 @@
                 userInBdd = snapshot.val();
                 scoreDisplay = this.add.text(this.cameras.main.width / 2, 10, userInBdd.score, {
                     fill: cssColors.aqua,
-                    font: 'bold 52px system-ui'
+                    font: 'bold system-ui'
                 })
-                    .setShadow(2, 2, cssColors.navy, 8);
+                    .setShadow(2, 2, cssColors.navy, 8).setFontSize(52);
             });
             timedEvent = this.time.addEvent({delay: 500, callback: reduceHealth, callbackScope: this, loop: true});
 
@@ -146,6 +168,7 @@
 
            // console.log(userConnected, 'joachim');
             this.tete2.rotation += 0.01;
+            this.dollars.rotation += 0.2;
             for (var i = 0; i < this.tetes.length; i++) {
                 var tete = this.tetes[i];
                 if( currentHealth == 0 || nextLevel == 10)
@@ -158,34 +181,44 @@
                                 tete.rotation+= 0.1;
                     }
 
-                    var tetesDepartX = this.tetesDepartX[i];
-                    var tetesDepartY = this.tetesDepartY[i];
-
-
                     tete.x += 2;
-                    if (positif == 3)//donc jamais car normalement c'est 1 pour faire sinusoidale
+                    if (levelNiveau%2 == 0)
+                        var pattern = 3;//tout droit
+                    else
+                        var pattern = 1;//sinusoidal
+                    if (positif == pattern)
                         tete.y += 2;
                     else
                         tete.y -= 2;
 
-                    if (tete.x > 800 + tetesDepartX) {
-                        tete.x = tetesDepartX;
-                        tete.y = tetesDepartY;
+                    if (tete.x > 800 + tete.departX) {
+                        tete.x = tete.departX;
+                        tete.y = tete.departY;
                     }
                 }
             }
 
 
             this.tete2.x -= 3 + levelNiveau;
-            if (positif == 1)
+            this.dollars.x -= 9 + levelNiveau;
+            if (positif == 1) {
+                this.dollars.y -= 2;
                 this.tete2.y += 2;
-            else
+            }
+            else {
+                this.dollars.y += 2;
                 this.tete2.y -= 2;
+            }
 
             if (this.tete2.x < 0) {
                 this.tete2.x = game.config.width - 50;
                 var value = Phaser.Math.Between(0, 600);
                 this.tete2.y = value;
+            }
+
+            if (this.dollars.x < 0) {
+                this.emitterEventDollars.emit('restartDollars');
+                this.emitterEventDollars.off('restartDollars', this.restartDollars, this);
             }
 
 
@@ -202,5 +235,22 @@
             if (augmente <= -60)
                 positif = 1;
 
+        }
+
+        restartDollars(){
+            this.time.addEvent({
+                delay: 15000,
+                callback: ()=>{
+                    this.emitterDollars.on = true;
+                    this.dollars.visible = true;
+                    this.dollars.x= game.config.width-50;
+                    var value = Phaser.Math.Between(0, 600);
+                    this.dollars.y= value;
+                    //on remet le listener
+                    this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
+                },
+                loop: false,
+
+            });
         }
     }

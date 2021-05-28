@@ -44,7 +44,7 @@ function badClick ()
     }
 }
 
-function actionOnClick () {
+function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
     var findSpark = this.particlesFind.createEmitter({
         speed: 100,
         scale: { start: 1, end: 0 },
@@ -57,13 +57,17 @@ function actionOnClick () {
     dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
         userInBdd = snapshot.val();
 
-        var ptVictoire = userInBdd.level;
+        var ptVictoire = levelNiveau;
         if( ptVictoire == 0 )
             ptVictoire = 1;
 
         ptVictoire = ptVictoire * 1 + userInBdd.score;
 
         scoreDisplay.setText(ptVictoire);
+        //console.log(scoreDisplay.fontSize);
+        //scoreDisplay.setFontSize(scoreDisplay.fontSize + 2);
+        //console.log(scoreDisplay.fontSize);
+
         if( nextLevel == 10 && levelNiveau == userInBdd.level )
             userInBdd.level++;
 
@@ -103,6 +107,54 @@ function actionOnClick () {
         delay: 200,
         callback: ()=>{
             text.setFill(cssColors.aqua);
+        },
+        loop: false
+    });
+
+}
+
+function actionDollars  () { //quand on clique sur les dollars
+
+    this.dollars.visible = false;
+    this.emitterDollars.on = false;
+
+    dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
+        userInBdd = snapshot.val();
+
+        var ptVictoire = userInBdd.level;
+        if( ptVictoire == 0 )
+            ptVictoire = 1;
+
+        ptVictoire = ptVictoire * 20 + userInBdd.score;
+
+        scoreDisplay.setText(ptVictoire);
+        this.time.addEvent({
+            delay: 100,
+            callback: ()=>{
+                scoreDisplay.setSize('40px');
+            },
+            loop: false
+        });
+
+        writeUserData(
+            userConnected.uid,
+            userConnected.displayName,
+            userConnected.email,
+            userConnected.photoURL,
+            userInBdd.level,
+            ptVictoire
+        );
+
+    });
+
+    this.time.addEvent({
+        delay: 15000,
+        callback: ()=>{
+            this.emitterDollars.on = true;
+            this.dollars.visible = true;
+            this.dollars.x= game.config.width-50;
+            var value = Phaser.Math.Between(0, 600);
+            this.dollars.y= value;
         },
         loop: false
     });
