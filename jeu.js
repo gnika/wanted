@@ -135,9 +135,9 @@
                 userInBdd = snapshot.val();
                 scoreDisplay = this.add.text(this.cameras.main.width / 2, 10, userInBdd.score, {
                     fill: cssColors.aqua,
-                    font: 'bold system-ui'
+                    font: 'bold 52px system-ui'
                 })
-                    .setShadow(2, 2, cssColors.navy, 8).setFontSize(52);
+                    .setShadow(2, 2, cssColors.navy, 8);
             });
             timedEvent = this.time.addEvent({delay: 500, callback: reduceHealth, callbackScope: this, loop: true});
 
@@ -165,6 +165,22 @@
             }
 
             text.setText(currentHealth).setShadow(2, 2, cssColors.navy, 8);
+
+            if( grossirText != null ){  //quand un score est modifié
+                if( grossir == 1 ) {
+                    grossirText.setFontSize(fontScore + 2);
+                    fontScore = fontScore + 2;
+                }else{
+                    grossirText.setFontSize(fontScore - 2);
+                    fontScore = fontScore - 2;
+                }
+                if( fontScore >= fontScoreDepart + 12)//pas trop sinon jeu ralenti et doit être pair
+                    grossir = 0;
+                if( grossir == 0 && fontScore == fontScoreDepart ){
+                    grossirText = null;
+                    grossir = 1;
+                }
+            }
 
            // console.log(userConnected, 'joachim');
             this.tete2.rotation += 0.01;

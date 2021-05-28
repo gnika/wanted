@@ -30,9 +30,12 @@ class MainScene extends Phaser.Scene    {
         dbRef = firebase.database().ref();
         database =  firebase.database();
 
-        //var userList    = this.plugins.get('rexfirebaseplugin').add.onlineUserList(firebaseConfig);
-
-        //var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard(firebaseConfig);
+        //je sais pas comment marche le leaderboard
+        var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
+            root: 'leaderboard-test',
+            // timeFilters: true,
+            pageItemCount: 3
+        })
 
         const decors = this.add.image(400, 300, 'decors');
         this.tweens.add({

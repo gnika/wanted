@@ -64,8 +64,9 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
         ptVictoire = ptVictoire * 1 + userInBdd.score;
 
         scoreDisplay.setText(ptVictoire);
-        //console.log(scoreDisplay.fontSize);
-        //scoreDisplay.setFontSize(scoreDisplay.fontSize + 2);
+        grossirText = scoreDisplay;
+
+
         //console.log(scoreDisplay.fontSize);
 
         if( nextLevel == 10 && levelNiveau == userInBdd.level )
@@ -117,6 +118,8 @@ function actionDollars  () { //quand on clique sur les dollars
 
     this.dollars.visible = false;
     this.emitterDollars.on = false;
+
+    grossirText = scoreDisplay;
 
     dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
         userInBdd = snapshot.val();
