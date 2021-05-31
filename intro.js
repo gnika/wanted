@@ -32,7 +32,7 @@ class MainScene extends Phaser.Scene    {
 
         //je sais pas comment marche le leaderboard
         var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
-            root: 'leaderboard-test',
+            root: 'users',
             // timeFilters: true,
             pageItemCount: 3
         })
@@ -98,8 +98,6 @@ class MainScene extends Phaser.Scene    {
                         .on('pointerout', () => this.enterButtonRestState(this.clickButton3));
 
                 }
-
-                //userlist je ne sais pas le faire marcher, le tableau renvoyé est vide
 
             },
             //args: [],

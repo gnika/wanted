@@ -43,6 +43,10 @@
     fontScore            = 52;//font par défaut
     fontScoreDepart      = 52;//font par défaut
     grossir              = 1;//etat par défaut pour faire grossir
+    teteWanted           = '';
+    bigTeteWanted        = '';
+    teteNotWanted        = '';
+    totalTetes           = new Array();
 
 
     window.onload = function() {
@@ -60,11 +64,11 @@
                     gravity: { y: 200 }
                 }
             },
-            scene: [MainScene, jeu, map]
+            scene: [MainScene, jeu, map, wanted]
         };
 
         game= new Phaser.Game(config);
-        //game.scene.start("MainScene");
+        //game.scene.start("wanted");
         //game.scene.start("map");
     };
 
@@ -72,6 +76,7 @@
 </script>
     <script type="text/javascript" src="intro.js"></script>
     <script type="text/javascript" src="map.js"></script>
+    <script type="text/javascript" src="wanted.js"></script>
     <script type="text/javascript" src="jeu.js"></script>
     <script type="text/javascript" src="functions.js"></script>
 </head>

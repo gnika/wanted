@@ -50,8 +50,8 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
         scale: { start: 1, end: 0 },
         blendMode: 'ADD'
     });
-    findSpark.startFollow(this.tete2);
-    this.tete2.visible = false;
+    findSpark.startFollow(this.teteWanted);
+    this.teteWanted.visible = false;
     nextLevel++;
 
     dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
@@ -91,10 +91,10 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
         delay: 500,
         callback: ()=>{
             findSpark.on = false;
-            this.tete2.visible = true;
-            this.tete2.x= game.config.width-50;
+            this.teteWanted.visible = true;
+            this.teteWanted.x= game.config.width-50;
             var value = Phaser.Math.Between(0, 600);
-            this.tete2.y= value;
+            this.teteWanted.y= value;
         },
         loop: false
     });
@@ -162,4 +162,8 @@ function actionDollars  () { //quand on clique sur les dollars
         loop: false
     });
 
+}
+
+function get_random (list) {
+    return list[Math.floor((Math.random()*list.length))];
 }
