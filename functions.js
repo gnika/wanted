@@ -64,11 +64,7 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
     dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
         userInBdd = snapshot.val();
 
-        var ptVictoire = levelNiveau;
-        if( ptVictoire == 0 )
-            ptVictoire = 1;
-
-        ptVictoire = ptVictoire * 1 + userInBdd.score;
+        var ptVictoire = headScore + userInBdd.score;
 
         scoreDisplay.setText(ptVictoire);
         grossirText = scoreDisplay;
@@ -139,7 +135,7 @@ function actionDollars  () { //quand on clique sur les dollars
         if( ptVictoire == 0 )
             ptVictoire = 1;
 
-        ptVictoire = ptVictoire * 20 + userInBdd.score;
+        ptVictoire = userInBdd.recompenseAdd + ptVictoire * 20 + userInBdd.score;
 
         scoreDisplay.setText(ptVictoire);
         this.time.addEvent({

@@ -84,7 +84,7 @@ class wanted extends Phaser.Scene {
         if( headScores == 0 )
             headScores = 1;
 
-        this.headScore = headScores * 1;
+        headScore = headScores * 1 + userInBdd.recompenseAdd;
 
 
     }
@@ -99,9 +99,9 @@ class wanted extends Phaser.Scene {
                 this.imageWanted.displayWidth =this.widthWanted ;
                 this.imageWanted.displayHeight =this.heightWanted ;
             }else{
-                this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 100, "REWARDS :   "+this.headScore,
+                this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 100, "REWARDS :   "+headScore,
                     {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
-                var gold = this.add.image(this.cameras.main.width / 2 + 150, this.cameras.main.height - 80, 'gold');
+                var gold = this.add.image(this.cameras.main.width / 2 + 160, this.cameras.main.height - 80, 'gold');
 
                 this.nbBanditDisplay.visible = true;
                 this.bandit.visible = true;

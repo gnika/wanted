@@ -349,18 +349,20 @@ class jeu extends Phaser.Scene {
                 }
             }
         }
-
+        var vitesseTete = userInBdd.vitesseEnMoins + 3 + levelNiveau;
+        if( vitesseTete < 3 )
+            vitesseTete = 3;
         for (var a = 0; a < this.falseTetes.length; a++) {
             if (this.falseTetes[a].direction == 0)
-                this.falseTetes[a].x -= 3 + levelNiveau;
+                this.falseTetes[a].x -= vitesseTete;
             else
-                this.falseTetes[a].x += 3 + levelNiveau;
+                this.falseTetes[a].x += vitesseTete;
         }
 
         if( this.teteWanted.direction == 0 )
-            this.teteWanted.x -= 3 + levelNiveau;
+            this.teteWanted.x -= vitesseTete;
         else
-            this.teteWanted.x += 3 + levelNiveau;
+            this.teteWanted.x += vitesseTete;
 
         if( this.dollars.direction == 0 )
             this.dollars.x -= 6 + levelNiveau;

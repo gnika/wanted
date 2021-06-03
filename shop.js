@@ -38,7 +38,10 @@ class shop extends Phaser.Scene {
         this.add.image(440, 300, 'pepite_mini');
 
         this.timeAcuel = this.add.text(500, 270, 50 + userInBdd.timeAdd, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.achat1 = this.add.text(600, 250, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
+
+
+        if( userInBdd.timeAdd < 50 )
+            this.achat1 = this.add.text(600, 250, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
             .on('pointerdown', () => this.achat('time'))
             .on('pointerover', () => this.enterButtonHoverState(this.achat1))
             .on('pointerout', () => this.enterButtonRestState(this.achat1));
@@ -47,7 +50,7 @@ class shop extends Phaser.Scene {
 
 
         //deuxieme ligne
-        this.timeAdd = this.add.text(157, 380, '+5', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
+        this.timeAdd = this.add.text(157, 380, '+2', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
         this.add.image(225, 400, 'gold_mini');
         this.timeAdd = this.add.text(250, 380, '/', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(315, 400, 'wanted_mini');
@@ -56,10 +59,11 @@ class shop extends Phaser.Scene {
         this.add.image(440, 400, 'pepite_mini');
 
         this.rewardAcuel = this.add.text(500, 370, userInBdd.recompenseAdd, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.achat2 = this.add.text(600, 350, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
-            .on('pointerdown', () => this.achat('reward'))
-            .on('pointerover', () => this.enterButtonHoverState(this.achat2))
-            .on('pointerout', () => this.enterButtonRestState(this.achat2));
+        if( userInBdd.recompenseAdd < 10 )
+            this.achat2 = this.add.text(600, 350, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
+                .on('pointerdown', () => this.achat('reward'))
+                .on('pointerover', () => this.enterButtonHoverState(this.achat2))
+                .on('pointerout', () => this.enterButtonRestState(this.achat2));
 
 
 
@@ -70,11 +74,12 @@ class shop extends Phaser.Scene {
         this.costVitesse = this.add.text(380, 470, '5 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(440, 500, 'pepite_mini');
 
-        this.vitesseAcuel = this.add.text(500, 470, userInBdd.recompenseAdd, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.achat3 = this.add.text(600, 450, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
-            .on('pointerdown', () => this.achat('vitesse'))
-            .on('pointerover', () => this.enterButtonHoverState(this.achat3))
-            .on('pointerout', () => this.enterButtonRestState(this.achat3));
+        this.vitesseAcuel = this.add.text(500, 470, userInBdd.vitesseEnMoins, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        if( userInBdd.vitesseEnMoins > -5 )
+            this.achat3 = this.add.text(600, 450, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
+                .on('pointerdown', () => this.achat('vitesse'))
+                .on('pointerover', () => this.enterButtonHoverState(this.achat3))
+                .on('pointerout', () => this.enterButtonRestState(this.achat3));
 
         pepiteDisplay = this.add.text(120, this.cameras.main.height - 80, userInBdd.pepite,
             {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
@@ -146,7 +151,9 @@ class shop extends Phaser.Scene {
                     userInBdd.entreeChariot
                 );
                 pepiteDisplay.setText(userInBdd.pepite);
-                this.timeAcuel.setText(userInBdd.timeAdd + 5);
+                this.timeAcuel.setText(userInBdd.timeAdd + 50);
+                if( userInBdd.timeAdd >= 50 )
+                    this.achat1.destroy();
             }else enoughMonney = 0;
         }
 
@@ -161,13 +168,15 @@ class shop extends Phaser.Scene {
                     userInBdd.score,
                     userInBdd.entreeSaloon,
                     userInBdd.timeAdd,
-                    userInBdd.recompenseAdd + 5,
+                    userInBdd.recompenseAdd + 2,
                     userInBdd.vitesseEnMoins,
                     userInBdd.pepite - 3,
                     userInBdd.entreeChariot
                 );
                 pepiteDisplay.setText(userInBdd.pepite);
                 this.rewardAcuel.setText(userInBdd.recompenseAdd);
+                if( userInBdd.recompenseAdd >= 10 )
+                    this.achat2.destroy();
             }else enoughMonney = 0;
         }
 
@@ -189,6 +198,8 @@ class shop extends Phaser.Scene {
                 );
                 pepiteDisplay.setText(userInBdd.pepite);
                 this.vitesseAcuel.setText(userInBdd.vitesseEnMoins);
+                if( userInBdd.vitesseEnMoins <= -5 )
+                    this.achat3.destroy();
             }else enoughMonney = 0;
         }
 

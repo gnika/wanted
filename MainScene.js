@@ -163,7 +163,7 @@ class MainScene extends Phaser.Scene    {
                 });
                 this.scene.start("shop");
             });
-            
+
          */
     }
     update () {
