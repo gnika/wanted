@@ -8,18 +8,29 @@ class jeu extends Phaser.Scene {
     }
 
     preload() {
-
-        this.load.plugin('rexfadeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfadeplugin.min.js', true);
-
-        this.load.setBaseURL('http://labs.phaser.io');
+        //this.load.setBaseURL('http://labs.phaser.io');
 
         this.load.image('sky', 'assets/skies/space3.png');
-        this.load.image('logo', 'assets/sprites/phaser3-logo.png');
+        this.load.image('fond1', 'assets/images/decors/fond1.jpg');
+        this.load.image('fond2', 'assets/images/decors/fond2.jpg');
+        this.load.image('fond3', 'assets/images/decors/fond3.jpg');
+        this.load.image('fond4', 'assets/images/decors/fond4.jpg');
+        this.load.image('fond5', 'assets/images/decors/fond5.jpg');
+        this.load.image('time', 'assets/images/time.png');
+        this.load.image('gold', 'assets/images/gold.png');
+        this.load.image('tete_map', 'assets/images/map/tete_map.png');
+        //this.load.image('logo', 'assets/sprites/phaser.png');
+        this.load.image('logo', 'assets/images/logo.png');
         this.load.image('red', 'assets/particles/red.png');
         this.load.image('fire', 'assets/particles/lit-smoke.png');
+        this.load.image('return', 'assets/images/return.png');
         this.load.image('particuleDollars', 'assets/particles/flame1.png');
-        this.load.image('dollars', 'http://wanted.local/assets/images/tetes/dollars.png');
-        this.load.spritesheet('button', 'http://wanted.local/assets/buttons/button_sprite_sheet.png', {
+        this.load.image('particlesPepite', 'assets/particles/smoke-puff.png');
+        this.load.image('dollars', 'assets/images/tetes/dollars.png');
+        this.load.image('pepite', 'assets/images/pepite.png');
+        this.load.image('pepite_mini', 'assets/images/tetes/pepite.png');
+        this.load.image('bandit', 'assets/images/tetes/bandit.png');
+        this.load.spritesheet('button', 'assets/buttons/button_sprite_sheet.png', {
             frameWidth: 193,
             frameHeight: 71
         });
@@ -34,16 +45,23 @@ class jeu extends Phaser.Scene {
         this.emitterEventDollars = new Phaser.Events.EventEmitter();
         this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
 
-        var decor = this.add.image(400, 300, 'sky');
+        var fond = Phaser.Math.Between(1, 5);
+        var decor = this.add.image(400, 400, 'fond'+fond);
+        var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
+            .on('pointerdown', () => this.scene.start("map"));
         decor.setInteractive();
         decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
-            this.time.addEvent({callback: badClick, callbackScope: this});
+            if( currentHealth > 0 && nextLevel < 10 )
+                this.time.addEvent({callback: badClick, callbackScope: this});
+            else
+                this.scene.start("map");
         });
 
 
         var particles = this.add.particles('red');
         this.particlesFind = this.add.particles('fire');
         this.particlesDollars = this.add.particles('particuleDollars');
+        this.particlesPepite = this.add.particles('particlesPepite');
 
         var emitter = particles.createEmitter({
             speed: 100,
@@ -62,6 +80,17 @@ class jeu extends Phaser.Scene {
         logo.setVelocity(100, 200);
         logo.setBounce(1, 1);
         logo.setCollideWorldBounds(true);
+
+        for( var i = 1; i<= nbBandit; i++ ) {
+            this.physics.add.image(300 + i*150, i*150+100, 'bandit').setVelocity(100+i*150, 200+i*150)
+                .setBounce(1, 1)
+                .setCollideWorldBounds(true)
+                .setInteractive()
+                .on('pointerdown', () => {        //quand on clique sur le bandit game over direct
+                    if( nextLevel < 10 )
+                        currentHealth = 0;
+            });
+        }
 
         emitter.startFollow(logo);
 
@@ -89,8 +118,42 @@ class jeu extends Phaser.Scene {
         this.dollars.on('pointerdown', () => {        //quand on clique sur l'élément recherché
             this.time.addEvent({callback: actionDollars, callbackScope: this});
         });
-
         this.emitterDollars.startFollow(this.dollars);
+////////////////////
+        this.catchPepite = 0;//ajout de la pépite seulement si le niveau est fini
+            this.time.addEvent({    //Apparition des pepites, une seule par partie
+            delay: Phaser.Math.Between(3000, currentHealth*1000),
+            //delay: Phaser.Math.Between(3000, 3001),
+            callback: () => {
+                if( nextLevel != 10 && currentHealth > 0 && levelNiveau > 1 ) {
+
+                    this.emitterPepite = this.particlesPepite.createEmitter({
+                        speed: 100,
+                        scale: {start: 1, end: 0},
+                        blendMode: 'ADD'
+                    });
+
+                    var dir = Phaser.Math.Between(0, 1);
+                    var posXdepart = 0;
+                    if (dir == 1)
+                        posXdepart = 50;
+                    else
+                        posXdepart = game.config.width - 50;
+                    this.pepite = this.add.image(posXdepart, Phaser.Math.Between(50, game.config.height - 50), 'pepite_mini');
+                    this.pepite.direction = dir;
+                    this.pepite.setInteractive();
+
+                    this.pepite.on('pointerdown', () => {        //quand on clique sur l'élément recherché
+                        this.time.addEvent({callback: actionPepite, callbackScope: this});
+                    });
+                    this.emitterPepite.startFollow(this.pepite);
+                    this.emitterPepite.on = true;
+                }
+            },
+            loop: false
+        });
+
+
 
         if( levelNiveau%2 == 0 ) {
             var v = -12;
@@ -135,21 +198,29 @@ class jeu extends Phaser.Scene {
         //timer
 
         //  So we can see how much health we have left
-        text = this.add.text(10, 10, ' 100', {fill: cssColors.aqua, font: 'bold 52px system-ui'})
+
+        text = this.add.text(10, 10, currentHealth,
+            {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
 
-        nextLevelText = this.add.text(this.cameras.main.width -150, 10, nextLevel, {fill: cssColors.aqua, font: 'bold 52px system-ui'})
+        nextLevelText = this.add.text(this.cameras.main.width -120, 10, nextLevel,
+            {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
 
         dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
             userInBdd = snapshot.val();
-            scoreDisplay = this.add.text(this.cameras.main.width / 2, 10, userInBdd.score, {
-                fill: cssColors.aqua,
-                font: 'bold 52px system-ui'
-            })
+            scoreDisplay = this.add.text(this.cameras.main.width / 2 - 70, 10, userInBdd.score,
+                {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
+                .setShadow(2, 2, cssColors.navy, 8);
+            pepiteDisplay = this.add.text(120, this.cameras.main.height - 80, userInBdd.pepite,
+                {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
                 .setShadow(2, 2, cssColors.navy, 8);
         });
         timedEvent = this.time.addEvent({delay: 500, callback: reduceHealth, callbackScope: this, loop: true});
+        var time = this.add.image(130, 40, 'time');
+        var tete_map = this.add.image(game.config.width - 40, 40, 'tete_map');
+        var gold = this.add.image(this.cameras.main.width /2 -120, 40, 'gold');
+        var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
         var wantedTete = this.add.image(game.config.width/2, game.config.height - 80, bigTeteWanted);
         wantedTete.alpha = 0.5;
 
@@ -159,22 +230,61 @@ class jeu extends Phaser.Scene {
 
     update() {
         if (currentHealth == 0) {
+            if( this.emitterDollars.on == true ){
+                writeUserData(
+                    userConnected.uid,
+                    userConnected.displayName,
+                    userConnected.email,
+                    userConnected.photoURL,
+                    userInBdd.level,
+                    userInBdd.score,
+                    userInBdd.entreeSaloon,
+                    userInBdd.timeAdd,
+                    userInBdd.recompenseAdd,
+                    userInBdd.vitesseEnMoins,
+                    0,
+                    userInBdd.entreeChariot
+                );
+                this.emitterDollars.on = false;
+                pepiteDisplay.setText(0);
+                pepiteDisplay.setFill('red');
+            }
             this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', {
                 fontSize: '32px',
                 fill: '#fff'
             }).setInteractive()
-                .on('pointerdown', () => this.scene.start("map"));
+                .on('pointerdown', () => {
+                    this.scene.start("map");
+                });
             this.teteWanted.destroy();
             for (var a = 0; a < this.falseTetes.length; a++)
                 this.falseTetes[a].destroy();
 
         }
         if (nextLevel == 10) {
+            this.emitterDollars.on = false;
             this.add.text(game.config.width / 2, game.config.height / 2, 'NEXT LEVEL', {
                 fontSize: '32px',
                 fill: '#fff'
             }).setInteractive()
-                .on('pointerdown', () => this.scene.start("map"));
+                .on('pointerdown', () => {
+                    writeUserData(
+                        userConnected.uid,
+                        userConnected.displayName,
+                        userConnected.email,
+                        userConnected.photoURL,
+                        userInBdd.level,
+                        userInBdd.score,
+                        userInBdd.entreeSaloon,
+                        userInBdd.timeAdd,
+                        userInBdd.recompenseAdd,
+                        userInBdd.vitesseEnMoins,
+                        userInBdd.pepite + this.catchPepite,
+                        userInBdd.entreeChariot
+                    );
+                        this.scene.start("map");
+                    }
+                );
             this.teteWanted.destroy();
             timedEvent.remove();
             for (var a = 0; a < this.falseTetes.length; a++)
@@ -200,7 +310,6 @@ class jeu extends Phaser.Scene {
             }
         }
 
-        // console.log(userConnected, 'joachim');
         this.teteWanted.rotation += 0.01;
         this.dollars.rotation += 0.2;
         //console.log(this.tetes[0].x);
@@ -254,16 +363,26 @@ class jeu extends Phaser.Scene {
             this.teteWanted.x += 3 + levelNiveau;
 
         if( this.dollars.direction == 0 )
-            this.dollars.x -= 9 + levelNiveau;
+            this.dollars.x -= 6 + levelNiveau;
         else
-            this.dollars.x += 9 + levelNiveau;
+            this.dollars.x += 6 + levelNiveau;
+
+        if(  this.pepite && this.pepite.direction == 0 )
+            this.pepite.x -= 7;
+        else if( this.pepite && this.pepite.direction == 1 )
+            this.pepite.x += 7;
+
         if (positif == 1) {
             this.dollars.y -= 2;
             this.teteWanted.y += 2;
+            if( this.pepite )
+                this.pepite.y -= 2;
         }
         else {
             this.dollars.y += 2;
             this.teteWanted.y -= 2;
+            if( this.pepite )
+                this.pepite.y += 2;
         }
 
         for (var a = 0; a < this.falseTetes.length; a++) {
@@ -302,6 +421,11 @@ class jeu extends Phaser.Scene {
         if (this.dollars.x < 0 ||  this.dollars.x > game.config.width ) {
             this.emitterEventDollars.emit('restartDollars');
             this.emitterEventDollars.off('restartDollars', this.restartDollars, this);
+        }
+
+        if (this.pepite && (this.pepite.x < 0 ||  this.pepite.x > game.config.width) ) {
+            this.pepite.destroy();
+            this.emitterPepite.on = false;
         }
 
 

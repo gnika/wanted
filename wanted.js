@@ -9,16 +9,19 @@ class wanted extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bigtete1', 'http://wanted.local/assets/images/tetes/tete1.png');
-        this.load.image('bigtete2', 'http://wanted.local/assets/images/tetes/tete2.png');
-        this.load.image('bigtete3', 'http://wanted.local/assets/images/tetes/tete3.png');
-        this.load.image('bigtete4', 'http://wanted.local/assets/images/tetes/tete4.png');
-        this.load.image('tete1', 'http://wanted.local/assets/images/tetes/tete1_mini.png');
-        this.load.image('tete2', 'http://wanted.local/assets/images/tetes/tete2_mini.png');
-        this.load.image('tete3', 'http://wanted.local/assets/images/tetes/tete3_mini.png');
-        this.load.image('tete4', 'http://wanted.local/assets/images/tetes/tete4_mini.png');
+        this.load.image('bigtete1', 'assets/images/tetes/tete1.png');
+        this.load.image('bigtete2', 'assets/images/tetes/tete2.png');
+        this.load.image('bigtete3', 'assets/images/tetes/tete3.png');
+        this.load.image('bigtete4', 'assets/images/tetes/tete4.png');
+        this.load.image('tete1', 'assets/images/tetes/tete1_mini.png');
+        this.load.image('tete2', 'assets/images/tetes/tete2_mini.png');
+        this.load.image('tete3', 'assets/images/tetes/tete3_mini.png');
+        this.load.image('tete4', 'assets/images/tetes/tete4_mini.png');
         this.load.image('fondWanted', 'assets/images/wanted/fond_wanted.png');
         this.load.image('wanted', 'assets/images/wanted/wanted.png');
+        this.load.image('gold', 'assets/images/gold.png');
+        this.load.image('pepite', 'assets/images/tetes/pepite.png');
+        this.load.image('bandit', 'assets/images/tetes/bandit.png');
     }
 
     create() {
@@ -41,7 +44,7 @@ class wanted extends Phaser.Scene {
             }
         }
         notWanted            = 'tete'+notWanted;
-        var decor = this.add.image(400, 300, 'fondWanted')
+        var decor = this.add.image(400, 400, 'fondWanted')
             .setInteractive()
             .on('pointerdown', () => {this.scene.start("jeu")}
             );
@@ -60,10 +63,28 @@ class wanted extends Phaser.Scene {
             callback: ()=>{
                 this.addWanted = 1;
                 this.imageWanted  =  this.add.sprite(game.config.width / 2, game.config.height / 2, 'wanted');
+                this.nbBanditDisplay = this.add.text(this.cameras.main.width / 2 - 200,  50, nbBandit,
+                    {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
+                this.bandit = this.add.sprite(this.cameras.main.width / 2 - 100,  70, 'bandit');
+                this.nbBanditDisplay.visible = false;
+                this.bandit.visible = false;
+
+                if( levelNiveau > 1 )var nbPepit = 1;else nbPepit = 0;
+                this.nbPepiteDisplay = this.add.text(this.cameras.main.width / 2 + 100,  50, nbPepit,
+                    {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
+                this.pepiteDisplay = this.add.sprite(this.cameras.main.width / 2 + 200 ,  70, 'pepite');
+                this.pepiteDisplay.visible = false;
+                this.nbPepiteDisplay.visible = false;
+
             },
             loop: false
         });
 
+        var headScores = levelNiveau;
+        if( headScores == 0 )
+            headScores = 1;
+
+        this.headScore = headScores * 1;
 
 
     }
@@ -77,6 +98,17 @@ class wanted extends Phaser.Scene {
                 this.heightWanted--;
                 this.imageWanted.displayWidth =this.widthWanted ;
                 this.imageWanted.displayHeight =this.heightWanted ;
+            }else{
+                this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 100, "REWARDS :   "+this.headScore,
+                    {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
+                var gold = this.add.image(this.cameras.main.width / 2 + 150, this.cameras.main.height - 80, 'gold');
+
+                this.nbBanditDisplay.visible = true;
+                this.bandit.visible = true;
+
+                this.pepiteDisplay.visible = true;
+                this.nbPepiteDisplay.visible = true;
+
             }
         }
     }

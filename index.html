@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.54.0/dist/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/@samme/colors@1.2.0/dist/colors.umd.js"></script>
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
-
 
     <!-- TODO: Add SDKs for Firebase products that you want to use
          https://firebase.google.com/docs/web/setup#available-libraries -->
@@ -21,10 +20,11 @@
 <script>
     var text, timer, nextLevelText;
     var cssColors        = colors.cssColors;
-    var currentHealth    = 100;
+    var currentHealth    = 50;
     var maxHealth        = 100;
     userConnected        = null;
     timedEvent           = null;
+    nbBandit             = 0;
     counter              = 0;
     augmente             = 0;
     positif              = 0;
@@ -32,6 +32,7 @@
     screenCenterY        = 0;
     nextLevel            = 0;
     scoreDisplay         = 0;
+    pepiteDisplay         = 0;
     textMenu             = 'brown';
     firebaseApp          = null;
     dbRef                = null;
@@ -64,20 +65,23 @@
                     gravity: { y: 200 }
                 }
             },
-            scene: [MainScene, jeu, map, wanted]
+            scene: [MainScene, jeu, map, wanted, leaderboard, saloon, shop]
         };
 
         game= new Phaser.Game(config);
-        //game.scene.start("wanted");
+        //  game.scene.start("shop");
         //game.scene.start("map");
     };
 
 
 </script>
-    <script type="text/javascript" src="intro.js"></script>
+    <script type="text/javascript" src="MainScene.js"></script>
     <script type="text/javascript" src="map.js"></script>
+    <script type="text/javascript" src="leaderboard.js"></script>
     <script type="text/javascript" src="wanted.js"></script>
     <script type="text/javascript" src="jeu.js"></script>
+    <script type="text/javascript" src="shop.js"></script>
+    <script type="text/javascript" src="saloon.js"></script>
     <script type="text/javascript" src="functions.js"></script>
 </head>
 <body>

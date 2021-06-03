@@ -1,14 +1,29 @@
-
-
 class MainScene extends Phaser.Scene    {
 
     constructor(){
-        super({key: 'MainScene' });
+        super({
+            key: 'MainScene',
+            pack: {
+                files: [{
+                    type: 'plugin',
+                    key: 'rexwebfontloaderplugin',
+                    url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexwebfontloaderplugin.min.js',
+                    start: true
+                }]
+            }
+            });
     }
     preload () {
-        this.load.image('decors', 'assets/images/decors/street.png');
-        this.load.plugin('rexfirebaseplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexfirebaseplugin.min.js', true);
+        this.plugins.get('rexwebfontloaderplugin').addToScene(this);
+        var WebFontConfig = {
+            google: {
+                families: ['Luckiest Guy']
+            }
+        };
 
+        this.load.rexWebFont(WebFontConfig);
+        this.load.image('decors', 'assets/images/decors/street.png');
+        this.load.image('return', 'assets/images/return.png');
 
     }
     create () {
@@ -30,12 +45,11 @@ class MainScene extends Phaser.Scene    {
         dbRef = firebase.database().ref();
         database =  firebase.database();
 
-        //je sais pas comment marche le leaderboard
-        var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
-            root: 'users',
-            // timeFilters: true,
-            pageItemCount: 3
-        })
+        //leaderboard = firestore pas database : https://phaser.discourse.group/t/plugin-leaderboard-error/9691/6
+        //var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
+          //  root: 'users',
+          //  pageItemCount: 3
+        //})
 
         const decors = this.add.image(400, 300, 'decors');
         this.tweens.add({
@@ -79,19 +93,19 @@ class MainScene extends Phaser.Scene    {
             delay: 3000,                // 3000 ms
             callback: ()=>{
                 if( userConnected != null) {
-                    this.clickButton = this.add.text(screenCenterX - 70, screenCenterY, 'JOUER', {fill: 'brown', font: 'bold 52px system-ui'})
+                    this.clickButton = this.add.text(screenCenterX - 160, screenCenterY - 20, 'JOUER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.passMap())
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton))
                         .on('pointerout', () => this.enterButtonRestState(this.clickButton));
 
-                    this.clickButton2 = this.add.text(screenCenterX - 170, screenCenterY + 70, 'SE DECONNECTER', {fill: 'brown', font: 'bold 52px system-ui'})
+                    this.clickButton2 = this.add.text(screenCenterX - 160, screenCenterY + 70, 'SE DECONNECTER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.deconnect(this.scene))
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton2))
                         .on('pointerout', () => this.enterButtonRestState(this.clickButton2));
                 }else{
-                    this.clickButton3 = this.add.text(screenCenterX /2, screenCenterY, 'SE CONNECTER', {fill: 'brown', font: 'bold 52px system-ui'})
+                    this.clickButton3 = this.add.text(screenCenterX /2, screenCenterY, 'SE CONNECTER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.connect(this.scene))
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton3))
@@ -99,12 +113,58 @@ class MainScene extends Phaser.Scene    {
 
                 }
 
+                this.clickButton4 = this.add.text(screenCenterX /2 + 50, screenCenterY - 100, 'SCORES', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+                    .setInteractive()
+                    .on('pointerdown', () => this.scene.start("leaderboard"))
+                    .on('pointerover', () => this.enterButtonHoverState(this.clickButton4))
+                    .on('pointerout', () => this.enterButtonRestState(this.clickButton4));
+
             },
             //args: [],
             callbackScope: this,
             loop: false
         });
 
+        /* //raccourci pour aller directement aux scenes que l'on code
+        var iconReturn = this.add.image(game.config.width - 200, game.config.height - 250, 'return').setInteractive()
+            .on('pointerdown', () => {
+                const dbRef = firebase.database().ref();
+                dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
+                    if (snapshot.exists()) {
+                        userInBdd = snapshot.val();
+                    } else {
+                        //on créé l'utilisateur
+                        writeUserData(
+                            userConnected.uid,
+                            userConnected.displayName,
+                            userConnected.email,
+                            userConnected.photoURL,
+                            0,//level
+                            0,//score
+                            0,//entreeSaloon
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+                        userInBdd        = userConnected;
+                        userInBdd.level  = 0;
+                        userInBdd.score  = 0;
+                        userInBdd.entreeSaloon  = 0;
+                        userInBdd.timeAdd  = 0;
+                        userInBdd.recompenseAdd  = 0;
+                        userInBdd.vitesseEnMoins  = 0;
+                        userInBdd.pepite  = 0;
+                        userInBdd.entreeChariot  = 0;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+                this.scene.start("shop");
+            });
+            
+         */
     }
     update () {
 
@@ -153,12 +213,24 @@ class MainScene extends Phaser.Scene    {
                     userConnected.displayName,
                     userConnected.email,
                     userConnected.photoURL,
-                    0,//level
-                    0//score
+                     0,//level
+                     0,//score
+                0,//entreeSaloon
+                   0,
+              0,
+               0,
+                    0,
+                    0
                 );
                 userInBdd        = userConnected;
                 userInBdd.level  = 0;
                 userInBdd.score  = 0;
+                userInBdd.entreeSaloon  = 0;
+                userInBdd.timeAdd  = 0;
+                userInBdd.recompenseAdd  = 0;
+                userInBdd.vitesseEnMoins  = 0;
+                userInBdd.pepite  = 0;
+                userInBdd.entreeChariot  = 0;
             }
         }).catch((error) => {
             console.error(error);
