@@ -102,7 +102,7 @@ class jeu extends Phaser.Scene {
             falseTete.direction = 0;
             this.falseTetes.push(falseTete);
         }
-        this.teteWanted = this.add.image(game.config.width - 150, 150, teteWanted);
+            this.teteWanted = this.add.image(game.config.width - 150, 150, teteWanted);
         this.teteWanted.direction = 0;
         this.teteWanted.setInteractive();
 

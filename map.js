@@ -192,7 +192,7 @@ class map extends Phaser.Scene {
         this.saloon = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon').setInteractive()
             .on('pointerover', () => this.saloon.visible = false);
 
-        this.chariotHover = this.add.image(350, 450, 'chariot_open').setInteractive()
+        this.chariotHover = this.add.image(370, 400, 'chariot_open').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.entreeChariot == 0 ) {
                     var dialog = this.rexUI.add.dialog({
@@ -271,8 +271,8 @@ class map extends Phaser.Scene {
                                     userInBdd.entreeChariot = 1;
                                     dialog.visible = false;
                                     var emitter0 = this.add.particles('spark0').createEmitter({
-                                        x: 200,
-                                        y: 300,
+                                        x: 370,
+                                        y: 400,
                                         speed: {min: -800, max: 800},
                                         angle: {min: 0, max: 360},
                                         scale: {start: 0.5, end: 0},
@@ -334,7 +334,7 @@ class map extends Phaser.Scene {
             .on('pointerover', () => this.chariot)
             .on('pointerout', () => this.chariot.visible = true);
 
-        this.chariot = this.add.image(350, 450, 'chariot').setInteractive()
+        this.chariot = this.add.image(370, 400, 'chariot').setInteractive()
             .on('pointerover', () => this.chariot.visible = false);
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
@@ -404,8 +404,8 @@ class map extends Phaser.Scene {
             }
 
             if( i == 7 ){
-                Xlevel = 490;
-                Ylevel = game.config.height - 710;
+                Xlevel = 530;
+                Ylevel = game.config.height - 700;
                 var bandits = 1;
                 this.pointMap7 = this.add.image(Xlevel, Ylevel, img);
             }

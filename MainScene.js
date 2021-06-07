@@ -170,7 +170,7 @@ class MainScene extends Phaser.Scene    {
                 }).catch((error) => {
                     console.error(error);
                 });
-                this.scene.start("map");
+                this.scene.start("shop");
             });
 
 

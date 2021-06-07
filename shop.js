@@ -17,18 +17,27 @@ class shop extends Phaser.Scene {
         this.load.image('wanted_mini', 'assets/images/wanted/wanted_mini.png');
         this.load.image('gold_mini', 'assets/images/gold_mini.png');
         this.load.image('tete1_mini', 'assets/images/tetes/tete1_mini.png');
+        this.load.image('fond_or', 'assets/images/fond_or.png');
+        this.load.image('gold', 'assets/images/gold.png');
+        this.load.image('level_done', 'assets/images/map/level_done.png');
     }
 
     create() {
-        var decor = this.add.image(400, 400, 'fondboard');
-        var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("map"));
+        this.effetAchat = 0;
+        this.add.image(400, 350, 'fondboard');
+        this.add.image(400, 750, 'fondboard');
 
+
+        this.add.image( 250, 120, 'fond_or');
+        this.scoreDisplay = this.add.text(270, 85, userInBdd.score,
+            {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52});
+        var gold = this.add.image(this.cameras.main.width /2 - 300, 125, 'gold');
 
 
         var r1 = this.add.rectangle(400, 300, 480, 80, 0XB45F06 );
         var r2 = this.add.rectangle(400, 400, 480, 80, 0XB45F06 );
         var r3 = this.add.rectangle(400, 500, 480, 80, 0XB45F06 );
+        var r4 = this.add.rectangle(400, 600, 480, 80, 0XB45F06 );
 
         //premiere ligne
         this.timeAdd = this.add.text(170, 280, '+ 5 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
@@ -81,12 +90,33 @@ class shop extends Phaser.Scene {
                 .on('pointerover', () => this.enterButtonHoverState(this.achat3))
                 .on('pointerout', () => this.enterButtonRestState(this.achat3));
 
+
+        //quatrieme ligne
+        this.timeAdd = this.add.text(161, 570, '- 1000', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(360, 600, 'gold_mini');
+        this.timeAdd = this.add.text(431, 570, '+ 5', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(525, 600, 'pepite_mini');
+
+        this.achat4 = this.add.text(600, 550, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
+            .on('pointerdown', () => this.achat('echange'))
+            .on('pointerover', () => this.enterButtonHoverState(this.achat4))
+            .on('pointerout', () => this.enterButtonRestState(this.achat4));
+
+        this.levelDone = this.add.text(700, 450, '- 1', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.levelDoneImg = this.add.image(700, 550, 'level_done');
+
+        this.levelDone.visible = false;
+        this.levelDoneImg.visible = false;
+
+        this.levelDone.originY = 450;
+        this.levelDoneImg.originY = 550;
+
         pepiteDisplay = this.add.text(120, this.cameras.main.height - 80, userInBdd.pepite,
             {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
 
-        var iconReturn = this.add.image(600, 600, 'return').setInteractive()
+        var iconReturn = this.add.image(600, 800, 'return').setInteractive()
             .on('pointerdown', () => this.scene.start("map"));
 
 
@@ -115,6 +145,14 @@ class shop extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
+        this.tweens.add({
+            targets: r4,
+            alpha: 0.2,
+            yoyo: false,
+            repeat: 0,
+            ease: 'Sine.easeInOut'
+        });
+
 
 
 
@@ -133,6 +171,7 @@ class shop extends Phaser.Scene {
     achat( attribut ) {
 
         var enoughMonney = 1;
+        var enoughGold   = 1;
 
         if( attribut == 'time'){
             if (userInBdd.pepite >= 5) {
@@ -203,6 +242,36 @@ class shop extends Phaser.Scene {
             }else enoughMonney = 0;
         }
 
+        if( attribut == 'echange'){
+
+            if (userInBdd.score >= 1000) {
+
+
+                this.effetAchat = 1;
+                var newLevel = userInBdd.level - 1;
+
+                if( newLevel < 0 )
+                    newLevel = 0;
+
+                writeUserData(
+                    userConnected.uid,
+                    userConnected.displayName,
+                    userConnected.email,
+                    userConnected.photoURL,
+                    newLevel,
+                    userInBdd.score - 1000,
+                    userInBdd.entreeSaloon,
+                    userInBdd.timeAdd,
+                    userInBdd.recompenseAdd,
+                    userInBdd.vitesseEnMoins,
+                    userInBdd.pepite + 5,
+                    userInBdd.entreeChariot
+                );
+                this.scoreDisplay.setText(userInBdd.score);
+                pepiteDisplay.setText(userInBdd.pepite);
+            }else enoughGold = 0;
+        }
+
         if ( enoughMonney == 0 ) {
             pepiteDisplay.setStyle({fill: 'red'})
             pepiteDisplay.setFontSize(60);
@@ -215,9 +284,37 @@ class shop extends Phaser.Scene {
                 loop: false
             });
         }
+
+        if ( enoughGold == 0 ) {
+            this.scoreDisplay.setStyle({fill: 'red'})
+            this.scoreDisplay.setFontSize(60);
+            this.time.addEvent({
+                delay: 300,
+                callback: () => {
+                    this.scoreDisplay.setFontSize(52);
+                    this.scoreDisplay.setStyle({fill: cssColors.yellow})
+                },
+                loop: false
+            });
+        }
     }
 
     update() {
+        if( this.effetAchat == 1 ){
+            this.levelDone.visible = true;
+            this.levelDoneImg.visible = true;
+
+            this.levelDone.y = this.levelDone.y+1;
+
+            this.levelDoneImg.y = this.levelDoneImg.y+1;
+            if( this.levelDone.y >= this.levelDone.originY + 50 ){
+                this.effetAchat = 0;
+                this.levelDone.visible = false;
+                this.levelDoneImg.visible = false;
+                this.levelDone.y = this.levelDone.originY;
+                this.levelDoneImg.y = this.levelDoneImg.originY;
+            }
+        }
 
     }
 }
