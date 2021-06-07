@@ -44,7 +44,7 @@ class wanted extends Phaser.Scene {
             }
         }
         notWanted            = 'tete'+notWanted;
-        var decor = this.add.image(400, 400, 'fondWanted')
+        var decor = this.add.image(400, 600, 'fondWanted')
             .setInteractive()
             .on('pointerdown', () => {this.scene.start("jeu")}
             );
@@ -86,6 +86,13 @@ class wanted extends Phaser.Scene {
 
         headScore = headScores * 1 + userInBdd.recompenseAdd;
 
+        this.rewDisplay = this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 200, "REWARDS :   "+headScore,
+            {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
+        this.goldDisplay = this.add.image(this.cameras.main.width / 2 + 160, this.cameras.main.height - 180, 'gold');
+
+
+        this.rewDisplay.visible = false;
+        this.goldDisplay.visible = false;
 
     }
 
@@ -99,15 +106,16 @@ class wanted extends Phaser.Scene {
                 this.imageWanted.displayWidth =this.widthWanted ;
                 this.imageWanted.displayHeight =this.heightWanted ;
             }else{
-                this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 100, "REWARDS :   "+headScore,
-                    {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
-                var gold = this.add.image(this.cameras.main.width / 2 + 160, this.cameras.main.height - 80, 'gold');
+
 
                 this.nbBanditDisplay.visible = true;
                 this.bandit.visible = true;
 
                 this.pepiteDisplay.visible = true;
                 this.nbPepiteDisplay.visible = true;
+
+                this.rewDisplay.visible = true;
+                this.goldDisplay.visible = true;
 
             }
         }

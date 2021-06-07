@@ -24,6 +24,9 @@ class MainScene extends Phaser.Scene    {
         this.load.rexWebFont(WebFontConfig);
         this.load.image('decors', 'assets/images/decors/street.png');
         this.load.image('return', 'assets/images/return.png');
+        this.load.image('menu1', 'assets/images/main/menu1.png');
+        this.load.image('menu2', 'assets/images/main/menu2.png');
+        this.load.image('menu3', 'assets/images/main/menu3.png');
 
     }
     create () {
@@ -92,20 +95,26 @@ class MainScene extends Phaser.Scene    {
         this.time.addEvent({
             delay: 3000,                // 3000 ms
             callback: ()=>{
+
+                this.add.image(screenCenterX, screenCenterY - 165, 'menu1');
+                this.add.image(screenCenterX, screenCenterY +160, 'menu3');
+
                 if( userConnected != null) {
-                    this.clickButton = this.add.text(screenCenterX - 160, screenCenterY - 20, 'JOUER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+
+                    this.add.image(screenCenterX, screenCenterY , 'menu2');
+                    this.clickButton = this.add.text(screenCenterX - 70 , screenCenterY - 200, 'PLAY', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.passMap())
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton))
                         .on('pointerout', () => this.enterButtonRestState(this.clickButton));
 
-                    this.clickButton2 = this.add.text(screenCenterX - 160, screenCenterY + 70, 'SE DECONNECTER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+                    this.clickButton2 = this.add.text(screenCenterX - 100, screenCenterY -40, 'LOGOUT', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.deconnect(this.scene))
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton2))
                         .on('pointerout', () => this.enterButtonRestState(this.clickButton2));
                 }else{
-                    this.clickButton3 = this.add.text(screenCenterX /2, screenCenterY, 'SE CONNECTER', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+                    this.clickButton3 = this.add.text(screenCenterX - 170 , screenCenterY - 200, 'LOGIN', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                         .setInteractive()
                         .on('pointerdown', () => this.connect(this.scene))
                         .on('pointerover', () => this.enterButtonHoverState(this.clickButton3))
@@ -113,7 +122,7 @@ class MainScene extends Phaser.Scene    {
 
                 }
 
-                this.clickButton4 = this.add.text(screenCenterX /2 + 50, screenCenterY - 100, 'SCORES', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+                this.clickButton4 = this.add.text(screenCenterX /2 + 110, screenCenterY + 120, 'RANK', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                     .setInteractive()
                     .on('pointerdown', () => this.scene.start("leaderboard"))
                     .on('pointerover', () => this.enterButtonHoverState(this.clickButton4))
@@ -125,7 +134,7 @@ class MainScene extends Phaser.Scene    {
             loop: false
         });
 
-        /* //raccourci pour aller directement aux scenes que l'on code
+         //raccourci pour aller directement aux scenes que l'on code
         var iconReturn = this.add.image(game.config.width - 200, game.config.height - 250, 'return').setInteractive()
             .on('pointerdown', () => {
                 const dbRef = firebase.database().ref();
@@ -161,10 +170,10 @@ class MainScene extends Phaser.Scene    {
                 }).catch((error) => {
                     console.error(error);
                 });
-                this.scene.start("shop");
+                this.scene.start("map");
             });
 
-         */
+
     }
     update () {
 

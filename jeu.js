@@ -154,19 +154,46 @@ class jeu extends Phaser.Scene {
         });
 
 
-
-        if( levelNiveau%2 == 0 ) {
-            var v = -12;
-            var d = 0;
+        if( levelNiveau == 0 || levelNiveau == 1  ) {
+            var distanceTetesX = 320;
+            var distanceTetesY = 324;
+            var nbTetesX       = 3;
+            var nbTetesY       = 4;
+        }else if( levelNiveau == 2 || levelNiveau == 3 ) {
+            var distanceTetesX = 160;
+            var distanceTetesY = 162;
+            var nbTetesX       = 6;
+            var nbTetesY       = 8;
+        }else if( levelNiveau == 4 || levelNiveau == 5 ) {
+            var distanceTetesX = 120;
+            var distanceTetesY = 121;
+            var nbTetesX       = 8;
+            var nbTetesY       = 11;
+        }else if( levelNiveau == 6 || levelNiveau == 7 ) {
+            var distanceTetesX = 100;
+            var distanceTetesY = 101;
+            var nbTetesX       = 9;
+            var nbTetesY       = 13;
         }
         else {
-            var v = 0;
-            var d = 0;
+            var distanceTetesX = 80;
+            var distanceTetesY = 81;
+            var nbTetesX       = 11;
+            var nbTetesY       = 16;
         }
 
-        for (var a = v; a < 11; a++) {
-            for (var i = d; i < 12; i++) {
-                var imgFalse = this.add.image(a * 80, 80 + (i * 80), teteNotWanted);
+        if( levelNiveau%2 == 0 ) {
+            var v = -15;
+            var d = 0;
+        }
+        else {//sinusoidal
+            var v = 0;
+            var d = -5;
+        }
+
+        for (var a = v; a < nbTetesX; a++) {
+            for (var i = d; i < nbTetesY; i++) {
+                var imgFalse = this.add.image(a * distanceTetesX, distanceTetesY + (i * distanceTetesY), teteNotWanted);
 
                 var value = Phaser.Math.Between(0, 10);
                 var sens = Phaser.Math.Between(0, 10);
@@ -175,22 +202,9 @@ class jeu extends Phaser.Scene {
                 if (sens < 5)
                     imgFalse.sens = 'negatif';
 
-                imgFalse.departX = a * 80;
-                imgFalse.departY = 80 + (i * 80);
+                imgFalse.departX = a * distanceTetesX;
+                imgFalse.departY = distanceTetesY + (i * distanceTetesY);
 
-                this.tetes.push(imgFalse);
-
-                var imgFalse = this.add.image(a * 80, 80 + (-i * 80), teteNotWanted);
-
-                var value = Phaser.Math.Between(0, 10);
-                var sens = Phaser.Math.Between(0, 10);
-                if (value < 5)
-                    imgFalse.rotation += 0.6;
-                if (sens < 5)
-                    imgFalse.sens = 'negatif';
-
-                imgFalse.departX = a * 80;
-                imgFalse.departY = 80 + (-i * 80);
                 this.tetes.push(imgFalse);
             }
         }
@@ -200,17 +214,17 @@ class jeu extends Phaser.Scene {
         //  So we can see how much health we have left
 
         text = this.add.text(10, 10, currentHealth,
-            {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
+            {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
 
         nextLevelText = this.add.text(this.cameras.main.width -120, 10, nextLevel,
-            {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
+            {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
 
         dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
             userInBdd = snapshot.val();
             scoreDisplay = this.add.text(this.cameras.main.width / 2 - 70, 10, userInBdd.score,
-                {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52})
+                {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
                 .setShadow(2, 2, cssColors.navy, 8);
             pepiteDisplay = this.add.text(120, this.cameras.main.height - 80, userInBdd.pepite,
                 {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})

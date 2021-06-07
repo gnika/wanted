@@ -9,8 +9,10 @@ class map extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('map', 'http://wanted.local/assets/images/map/map.png');
-        this.load.image('tete_map', 'http://wanted.local/assets/images/map/tete_map.png');
+        this.load.image('map', 'assets/images/map/map_new.png');
+        this.load.image('level', 'assets/images/map/level.png');
+        this.load.image('level_done', 'assets/images/map/level_done.png');
+        this.load.image('tete_map', 'assets/images/map/tete_map.png');
         this.load.image('return', 'assets/images/return.png');
         this.load.image('saloon', 'assets/images/map/saloon.png');
         this.load.image('saloon_open', 'assets/images/map/saloon_open.png');
@@ -21,6 +23,7 @@ class map extends Phaser.Scene {
         this.load.image('spark0', 'assets/particles/blue.png');
         this.load.image('spark1', 'assets/particles/red.png');
         this.load.image('pepite', 'assets/images/pepite.png');
+        this.load.image('fond_or', 'assets/images/fond_or.png');
 
     }
 
@@ -33,11 +36,12 @@ class map extends Phaser.Scene {
         });
 
         var decor = this.add.image(game.config.width/2, game.config.height/2, 'map');
+        var decor = this.add.image( 250, 120, 'fond_or');
 
-        scoreDisplay = this.add.text(this.cameras.main.width / 2 - 70, 10, userInBdd.score,
-            {fill: cssColors.aqua, fontFamily: "Luckiest Guy", fontSize: 52});
+        scoreDisplay = this.add.text(270, 85, userInBdd.score,
+            {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52});
 
-        var gold = this.add.image(this.cameras.main.width /2 -120, 40, 'gold');
+        var gold = this.add.image(this.cameras.main.width /2 - 300, 125, 'gold');
         pepiteDisplay = this.add.text(120, this.cameras.main.height - 80, userInBdd.pepite,
             {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
@@ -117,7 +121,7 @@ class map extends Phaser.Scene {
                                         userInBdd.pepite,
                                          userInBdd.entreeChariot
                                      );
-                                     scoreDisplay.setText(userInBdd.score - 1000);
+                                     scoreDisplay.setText(userInBdd.score);
                                      
                                     userInBdd.entreeSaloon = 1;
                                     dialog.visible = false;
@@ -162,7 +166,7 @@ class map extends Phaser.Scene {
                                         delay: 300,
                                         callback: () => {
                                             scoreDisplay.setFontSize(52);
-                                            scoreDisplay.setStyle({fill: cssColors.aqua})
+                                            scoreDisplay.setStyle({fill: cssColors.yellow})
                                         },
                                         loop: false
                                     });
@@ -188,7 +192,7 @@ class map extends Phaser.Scene {
         this.saloon = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon').setInteractive()
             .on('pointerover', () => this.saloon.visible = false);
 
-        this.chariotHover = this.add.image(200, 300, 'chariot_open').setInteractive()
+        this.chariotHover = this.add.image(350, 450, 'chariot_open').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.entreeChariot == 0 ) {
                     var dialog = this.rexUI.add.dialog({
@@ -307,7 +311,7 @@ class map extends Phaser.Scene {
                                         delay: 300,
                                         callback: () => {
                                             pepiteDisplay.setFontSize(52);
-                                            pepiteDisplay.setStyle({fill: cssColors.aqua})
+                                            pepiteDisplay.setStyle({fill: cssColors.yellow})
                                         },
                                         loop: false
                                     });
@@ -330,55 +334,122 @@ class map extends Phaser.Scene {
             .on('pointerover', () => this.chariot)
             .on('pointerout', () => this.chariot.visible = true);
 
-        this.chariot = this.add.image(200, 300, 'chariot').setInteractive()
+        this.chariot = this.add.image(350, 450, 'chariot').setInteractive()
             .on('pointerover', () => this.chariot.visible = false);
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
             .on('pointerdown', () => this.scene.start("MainScene"));
 
-        for (var i = 0; i <= userInBdd.level; i++){
-            if( i == 0)
-                this.pointMap0 = this.add.image(game.config.width/2 - 10, game.config.height - 120, 'tete_map')
+        currentHealth = 50 + userInBdd.timeAdd;
+        nextLevel     = 0;
+
+
+        for (var i = 0; i <= 9; i++){
+            if( userInBdd.level >= i )
+                var img = 'level_done';
+            else
+                var img = 'level';
+
+            var Xlevel = 0;
+            var Ylevel = 0;
+            var bandits = 0;
+
+            if( i == 0 ){
+                Xlevel = game.config.width / 2 + 135;
+                Ylevel = game.config.height - 120;
+                var bandits = 0;
+                this.pointMap0 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 1 ){
+                Xlevel = game.config.width / 2 - 50;
+                Ylevel = game.config.height - 130;
+                var bandits = 0;
+                this.pointMap1 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 2 ){
+                Xlevel = 180;
+                Ylevel = game.config.height - 200;
+                var bandits = 1;
+                this.pointMap2 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 3 ){
+                Xlevel = 280;
+                Ylevel = game.config.height - 340;
+                var bandits = 1;
+                this.pointMap3 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 4 ){
+                Xlevel = 400;
+                Ylevel = game.config.height - 470;
+                var bandits = 1;
+                this.pointMap4 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 5 ){
+                Xlevel = 160;
+                Ylevel = game.config.height - 600;
+                var bandits = 1;
+                this.pointMap5 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 6 ){
+                Xlevel = 280;
+                Ylevel = game.config.height - 740;
+                var bandits = 1;
+                this.pointMap6 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 7 ){
+                Xlevel = 490;
+                Ylevel = game.config.height - 710;
+                var bandits = 1;
+                this.pointMap7 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( i == 8 ){
+                Xlevel = 640;
+                Ylevel = game.config.height - 820;
+                var bandits = 2;
+                this.pointMap8 = this.add.image(640 , game.config.height - 820, img);
+            }
+
+            if( i == 9 ){
+                Xlevel = 395;
+                Ylevel = game.config.height - 860;
+                var bandits = 2;
+                this.pointMap9 = this.add.image(Xlevel, Ylevel, img);
+            }
+
+            if( userInBdd.level == i ) {
+                var niveau = i;
+                var banditsParam = bandits;
+                this.teteHead = this.add.image(Xlevel, Ylevel, 'tete_map')
                     .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 0; levelNiveau = 0; currentHealth = 50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap0))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap0));
-            if( i == 1)
-                this.pointMap1 = this.add.image(game.config.width/1.5 + 20 , game.config.height - 160, 'tete_map')
-                    .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 1; levelNiveau = 1; currentHealth =  50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap1))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap1));
-            if( i == 2)
-                this.pointMap2 = this.add.image(game.config.width/2  + 30, game.config.height - 190, 'tete_map')
-                    .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 1; levelNiveau = 2; currentHealth =  50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap2))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap2));
-            if( i == "3")
-                this.pointMap3 = this.add.image(game.config.width/2 -40, game.config.height - 240, 'tete_map')
-                    .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 1; levelNiveau = 3; currentHealth =  50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap3))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap3));
-            if( i == "4")
-                this.pointMap4 = this.add.image(game.config.width/3 - 40, game.config.height - 260, 'tete_map')
-                    .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 2; levelNiveau = 4; currentHealth =  50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap4))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap4));
-            if( i == "5")
-                this.pointMap5 = this.add.image(game.config.width/2 -25, game.config.height - 320, 'tete_map')
-                    .setInteractive()
-                    .on('pointerdown', () => {nbBandit = 2; levelNiveau = 5; currentHealth =  50 + userInBdd.timeAdd; nextLevel = 0; this.scene.start("wanted")})
-                    .on('pointerover', () => this.enterPointHoverState(this.pointMap5))
-                    .on('pointerout', () => this.enterPointRestState(this.pointMap5));
+                    .on('pointerdown', () => {
+                        this.passWanted(banditsParam, niveau);
+                    })
+                    .on('pointerover', () => this.enterPointHoverState(this.teteHead))
+                    .on('pointerout', () => this.enterPointRestState(this.teteHead));
+            }
+
         }
 
 
     }
 
     update() {
+
+    }
+
+    passWanted( nbBanditParam, levelNiveauParam) {console.log(levelNiveauParam);
+        nbBandit = nbBanditParam;
+        levelNiveau = levelNiveauParam;
+        if( userInBdd.level == levelNiveauParam )
+        this.scene.start("wanted");
 
     }
 
