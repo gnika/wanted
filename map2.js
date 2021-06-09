@@ -1,15 +1,15 @@
 
 
 
-class map extends Phaser.Scene {
+class map2 extends Phaser.Scene {
     constructor() {
         super({
-            key: 'map'
+            key: 'map2'
         });
     }
 
     preload() {
-        this.load.image('map', 'assets/images/map/map.png');
+        this.load.image('map2', 'assets/images/map/map2.png');
         this.load.image('level', 'assets/images/map/level.png');
         this.load.image('level_done', 'assets/images/map/level_done.png');
         this.load.image('level_precedent', 'assets/images/map/level_precedent.png');
@@ -38,7 +38,7 @@ class map extends Phaser.Scene {
             }
         });
 
-        var decor = this.add.image(game.config.width/2, game.config.height/2, 'map');
+        var decor = this.add.image(game.config.width/2, game.config.height/2, 'map2');
         var decor = this.add.image( 250, 120, 'fond_or');
 
         scoreDisplay = this.add.text(270, 85, userInBdd.score,
@@ -49,14 +49,6 @@ class map extends Phaser.Scene {
             {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
             .setShadow(2, 2, cssColors.navy, 8);
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
-
-        if( userInBdd.level <= 9 ){
-            this.add.image(game.config.width/2 + 200, 80, 'next_off');
-        }
-        else{
-            this.add.image(game.config.width/2 + 200, 80, 'next_on').setInteractive()
-                .on('pointerdown', () => this.scene.start("map2"));
-        }
 
         this.saloonHover = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon_open').setInteractive()
             .on('pointerdown', () => {
@@ -118,22 +110,22 @@ class map extends Phaser.Scene {
                             //this.print.text += index + ': ' + button.text + '\n';
                             if (index == 0) {//yes
                                 if (userInBdd.score >= 1000) {
-                                     writeUserData(
-                                         userConnected.uid,
-                                         userConnected.displayName,
-                                         userConnected.email,
-                                         userConnected.photoURL,
-                                         userInBdd.level,
-                                         userInBdd.score - 1000,
-                                         1,
+                                    writeUserData(
+                                        userConnected.uid,
+                                        userConnected.displayName,
+                                        userConnected.email,
+                                        userConnected.photoURL,
+                                        userInBdd.level,
+                                        userInBdd.score - 1000,
+                                        1,
                                         userInBdd.timeAdd,
                                         userInBdd.recompenseAdd,
                                         userInBdd.vitesseEnMoins,
                                         userInBdd.pepite,
-                                         userInBdd.entreeChariot
-                                     );
-                                     scoreDisplay.setText(userInBdd.score);
-                                     
+                                        userInBdd.entreeChariot
+                                    );
+                                    scoreDisplay.setText(userInBdd.score);
+
                                     userInBdd.entreeSaloon = 1;
                                     dialog.visible = false;
                                     var emitter0 = this.add.particles('spark0').createEmitter({
@@ -203,160 +195,16 @@ class map extends Phaser.Scene {
         this.saloon = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon').setInteractive()
             .on('pointerover', () => this.saloon.visible = false);
 
-        this.chariotHover = this.add.image(370, 400, 'chariot_open').setInteractive()
-            .on('pointerdown', () => {
-                if( userInBdd.entreeChariot == 0 ) {
-                    var dialog = this.rexUI.add.dialog({
-                        x: 400,
-                        y: 300,
-
-                        background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
-
-                        title: this.rexUI.add.label({
-                            background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
-                            text: this.add.text(50, 0, 'Chariot', {
-                                fontSize: '24px', fontFamily: "Luckiest Guy"
-                            }),
-                            space: {
-                                left: 15,
-                                right: 15,
-                                top: 10,
-                                bottom: 10
-                            }
-                        }),
-
-                        content:
-                            this.add.text(0, 0, '3 gold nuggets to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
-
-                        ,
-
-                        actions: [], // Assing an empty array instead of `undefined`
-
-                        space: {
-                            title: 25,
-                            content: 25,
-                            action: 15,
-
-                            left: 20,
-                            right: 20,
-                            top: 20,
-                            bottom: 20,
-                        },
-
-                        align: {
-                            actions: 'right', // 'center'|'left'|'right'
-                        },
-
-                        expand: {
-                            content: false, // Content is a pure text object
-                        }
-                    })
-                        .addAction([
-                            createLabel(this, 'Yes'),
-                            createLabel(this, 'No'),
-                        ])
-                        .layout()
-                        // .drawBounds(this.add.graphics(), 0xff0000)
-                        .popUp(1000);
-                    dialog
-                        .on('button.click', function (button, groupName, index) {
-                            //this.print.text += index + ': ' + button.text + '\n';
-                            if (index == 0) {//yes
-                                if (userInBdd.pepite >= 3) {
-                                     writeUserData(
-                                         userConnected.uid,
-                                         userConnected.displayName,
-                                         userConnected.email,
-                                         userConnected.photoURL,
-                                         userInBdd.level,
-                                         userInBdd.score,
-                                         userInBdd.entreeSaloon,
-                                        userInBdd.timeAdd,
-                                        userInBdd.recompenseAdd,
-                                        userInBdd.vitesseEnMoins,
-                                        userInBdd.pepite - 3,
-                                         1
-                                     );
-                                     pepiteDisplay.setText(userInBdd.pepite);
-
-                                    userInBdd.entreeChariot = 1;
-                                    dialog.visible = false;
-                                    var emitter0 = this.add.particles('spark0').createEmitter({
-                                        x: 370,
-                                        y: 400,
-                                        speed: {min: -800, max: 800},
-                                        angle: {min: 0, max: 360},
-                                        scale: {start: 0.5, end: 0},
-                                        blendMode: 'SCREEN',
-                                        //active: false,
-                                        lifespan: 600,
-                                        gravityY: 800
-                                    });
-
-                                    var emitter1 = this.add.particles('spark1').createEmitter({
-                                        x: 200,
-                                        y: 300,
-                                        speed: {min: -800, max: 800},
-                                        angle: {min: 0, max: 360},
-                                        scale: {start: 0.3, end: 0},
-                                        blendMode: 'SCREEN',
-                                        //active: false,
-                                        lifespan: 300,
-                                        gravityY: 800
-                                    });
-
-                                    this.time.addEvent({
-                                        delay: 300,
-                                        callback: () => {
-                                            emitter0.on = false;
-                                            emitter1.on = false;
-                                        },
-                                        loop: false
-                                    });
-
-                                } else {
-                                    //TweenHelper.flashElement(this, scoreDisplay);
-                                    pepiteDisplay.setStyle({fill: 'red'})
-                                    pepiteDisplay.setFontSize(60);
-                                    this.time.addEvent({
-                                        delay: 300,
-                                        callback: () => {
-                                            pepiteDisplay.setFontSize(52);
-                                            pepiteDisplay.setStyle({fill: cssColors.yellow})
-                                        },
-                                        loop: false
-                                    });
-                                }
-                            } else {
-                                dialog.visible = false;
-                            }
-                        }, this)
-                        .on('button.over', function (button, groupName, index) {
-                            button.getElement('background').setStrokeStyle(1, 0xffffff);
-                        })
-                        .on('button.out', function (button, groupName, index) {
-                            button.getElement('background').setStrokeStyle();
-                        });
-                }else{
-                    this.scene.start("shop");
-                }
-
-            })
-            .on('pointerover', () => this.chariot)
-            .on('pointerout', () => this.chariot.visible = true);
-
-        this.chariot = this.add.image(370, 400, 'chariot').setInteractive()
-            .on('pointerover', () => this.chariot.visible = false);
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("MainScene"));
+            .on('pointerdown', () => this.scene.start("map"));
 
         currentHealth = 50 + userInBdd.timeAdd;
         nextLevel     = 0;
 
 
         for (var i = 0; i <= 9; i++){
-            if( userInBdd.level >= i )
+            if( userInBdd.level - 10 >= i )
                 var img = 'level_done';
             else
                 var img = 'level';
@@ -368,75 +216,75 @@ class map extends Phaser.Scene {
             if( i == 0 ){
                 Xlevel = game.config.width / 2 + 135;
                 Ylevel = game.config.height - 120;
-                var bandits = 0;
+                var bandits = 2;
                 this.pointMap0 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 1 ){
                 Xlevel = game.config.width / 2 - 50;
                 Ylevel = game.config.height - 130;
-                var bandits = 0;
+                var bandits = 3;
                 this.pointMap1 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 2 ){
                 Xlevel = 180;
                 Ylevel = game.config.height - 200;
-                var bandits = 1;
+                var bandits = 3;
                 this.pointMap2 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 3 ){
                 Xlevel = 280;
                 Ylevel = game.config.height - 340;
-                var bandits = 1;
+                var bandits = 3;
                 this.pointMap3 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 4 ){
-                Xlevel = 400;
-                Ylevel = game.config.height - 470;
-                var bandits = 1;
+                Xlevel = 430;
+                Ylevel = game.config.height - 430;
+                var bandits = 4;
                 this.pointMap4 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 5 ){
-                Xlevel = 160;
-                Ylevel = game.config.height - 600;
-                var bandits = 1;
+                Xlevel = 310;
+                Ylevel = game.config.height - 490;
+                var bandits = 4;
                 this.pointMap5 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 6 ){
-                Xlevel = 280;
-                Ylevel = game.config.height - 740;
-                var bandits = 1;
+                Xlevel = 190;
+                Ylevel = game.config.height - 700;
+                var bandits = 4;
                 this.pointMap6 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 7 ){
-                Xlevel = 530;
+                Xlevel = 500;
                 Ylevel = game.config.height - 700;
-                var bandits = 1;
+                var bandits = 5;
                 this.pointMap7 = this.add.image(Xlevel, Ylevel, img);
             }
 
             if( i == 8 ){
-                Xlevel = 640;
-                Ylevel = game.config.height - 820;
-                var bandits = 2;
+                Xlevel = 600;
+                Ylevel = game.config.height - 850;
+                var bandits = 5;
                 this.pointMap8 = this.add.image(Xlevel , Ylevel, img);
             }
 
             if( i == 9 ){
-                Xlevel = 395;
+                Xlevel = 445;
                 Ylevel = game.config.height - 860;
-                var bandits = 2;
+                var bandits = 6;
                 this.pointMap9 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( userInBdd.level == i ) {
-                var niveau = i;
+            if( userInBdd.level - 10 == i ) {
+                var niveau = i + 10;
                 var banditsParam = bandits;
                 this.teteHead = this.add.image(Xlevel, Ylevel, 'tete_map')
                     .setInteractive()
@@ -447,8 +295,8 @@ class map extends Phaser.Scene {
                     .on('pointerout', () => this.enterPointRestState(this.teteHead));
             }
 
-            if( userInBdd.level -1 == i ) {
-                var niveauPrecedent = i;
+            if( userInBdd.level - 10 -1 == i ) {
+                var niveauPrecedent = i + 10;
                 var banditsParamPrecedent = bandits;
                 this.teteHead = this.add.image(Xlevel, Ylevel, 'level_precedent')
                     .setInteractive()
@@ -466,11 +314,11 @@ class map extends Phaser.Scene {
 
     }
 
-    passWanted( nbBanditParam, levelNiveauParam) {console.log(levelNiveauParam);
+    passWanted( nbBanditParam, levelNiveauParam) {
         nbBandit = nbBanditParam;
         levelNiveau = levelNiveauParam;
         if( userInBdd.level == levelNiveauParam ||  userInBdd.level -1 == levelNiveauParam )
-        this.scene.start("wanted");
+            this.scene.start("wanted");
 
     }
 

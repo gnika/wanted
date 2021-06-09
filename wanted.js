@@ -80,15 +80,15 @@ class wanted extends Phaser.Scene {
             loop: false
         });
 
-        var headScores = levelNiveau;
+        var headScores = levelNiveau * 50;
         if( headScores == 0 )
-            headScores = 1;
+            headScores = 50;
 
-        headScore = headScores * 1 + userInBdd.recompenseAdd;
+        headScore = headScores + userInBdd.recompenseAdd;
 
         this.rewDisplay = this.add.text(this.cameras.main.width / 2 - 200, this.cameras.main.height - 200, "REWARDS :   "+headScore,
             {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
-        this.goldDisplay = this.add.image(this.cameras.main.width / 2 + 160, this.cameras.main.height - 180, 'gold');
+        this.goldDisplay = this.add.image(this.cameras.main.width / 2 + 220, this.cameras.main.height - 180, 'gold');
 
 
         this.rewDisplay.visible = false;

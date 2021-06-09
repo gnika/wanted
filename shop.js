@@ -59,10 +59,10 @@ class shop extends Phaser.Scene {
 
 
         //deuxieme ligne
-        this.timeAdd = this.add.text(157, 380, '+2', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
-        this.add.image(225, 400, 'gold_mini');
-        this.timeAdd = this.add.text(250, 380, '/', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.add.image(315, 400, 'wanted_mini');
+        this.timeAdd = this.add.text(157, 380, '+25', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
+        this.add.image(245, 400, 'gold_mini');
+        this.timeAdd = this.add.text(270, 380, '/', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(335, 400, 'wanted_mini');
 
         this.costReward = this.add.text(380, 370, '3 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(440, 400, 'pepite_mini');
@@ -207,7 +207,7 @@ class shop extends Phaser.Scene {
                     userInBdd.score,
                     userInBdd.entreeSaloon,
                     userInBdd.timeAdd,
-                    userInBdd.recompenseAdd + 2,
+                    userInBdd.recompenseAdd + 25,
                     userInBdd.vitesseEnMoins,
                     userInBdd.pepite - 3,
                     userInBdd.entreeChariot

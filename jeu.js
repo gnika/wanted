@@ -48,13 +48,38 @@ class jeu extends Phaser.Scene {
         var fond = Phaser.Math.Between(1, 5);
         var decor = this.add.image(400, 400, 'fond'+fond);
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("map"));
+            .on('pointerdown', () => {
+                if( userInBdd.level < 10 )
+                    this.scene.start("map");
+                else
+                    this.scene.start("map2");
+            });
         decor.setInteractive();
         decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
             if( currentHealth > 0 && nextLevel < 10 )
                 this.time.addEvent({callback: badClick, callbackScope: this});
-            else
-                this.scene.start("map");
+            else{
+                var pepiteBonus = Math.trunc(currentHealth / 10);
+
+                writeUserData(
+                    userConnected.uid,
+                    userConnected.displayName,
+                    userConnected.email,
+                    userConnected.photoURL,
+                    userInBdd.level,
+                    userInBdd.score,
+                    userInBdd.entreeSaloon,
+                    userInBdd.timeAdd,
+                    userInBdd.recompenseAdd,
+                    userInBdd.vitesseEnMoins,
+                    userInBdd.pepite + this.catchPepite + pepiteBonus,
+                    userInBdd.entreeChariot
+                );
+                if( userInBdd.level < 10 )
+                    this.scene.start("map");
+                else
+                    this.scene.start("map2");
+            }
         });
 
 
@@ -263,12 +288,15 @@ class jeu extends Phaser.Scene {
                 pepiteDisplay.setText(0);
                 pepiteDisplay.setFill('red');
             }
-            this.add.text(game.config.width / 2, game.config.height / 2, 'GAME OVER', {
-                fontSize: '32px',
+            this.add.text(game.config.width / 2 - 150, game.config.height / 2, 'GAME OVER', {
+                fontSize: '52px',
                 fill: '#fff'
             }).setInteractive()
                 .on('pointerdown', () => {
-                    this.scene.start("map");
+                    if( userInBdd.level < 10 )
+                        this.scene.start("map");
+                    else
+                        this.scene.start("map2");
                 });
             this.teteWanted.destroy();
             for (var a = 0; a < this.falseTetes.length; a++)
@@ -277,28 +305,11 @@ class jeu extends Phaser.Scene {
         }
         if (nextLevel == 10) {
             this.emitterDollars.on = false;
-            this.add.text(game.config.width / 2, game.config.height / 2, 'NEXT LEVEL', {
-                fontSize: '32px',
+
+            this.add.text(game.config.width / 2 - 150, game.config.height / 2, 'NEXT LEVEL', {
+                fontSize: '52px',
                 fill: '#fff'
-            }).setInteractive()
-                .on('pointerdown', () => {
-                    writeUserData(
-                        userConnected.uid,
-                        userConnected.displayName,
-                        userConnected.email,
-                        userConnected.photoURL,
-                        userInBdd.level,
-                        userInBdd.score,
-                        userInBdd.entreeSaloon,
-                        userInBdd.timeAdd,
-                        userInBdd.recompenseAdd,
-                        userInBdd.vitesseEnMoins,
-                        userInBdd.pepite + this.catchPepite,
-                        userInBdd.entreeChariot
-                    );
-                        this.scene.start("map");
-                    }
-                );
+            });
             this.teteWanted.destroy();
             timedEvent.remove();
             for (var a = 0; a < this.falseTetes.length; a++)
