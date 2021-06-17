@@ -100,7 +100,7 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
             findSpark.on = false;
             this.teteWanted.visible = true;
             this.teteWanted.x= game.config.width-50;
-            var value = Phaser.Math.Between(0, 600);
+            var value = Phaser.Math.Between(0, 900);
             this.teteWanted.y= value;
         },
         loop: false

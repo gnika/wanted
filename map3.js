@@ -1,10 +1,10 @@
 
 
 
-class map2 extends Phaser.Scene {
+class map3 extends Phaser.Scene {
     constructor() {
         super({
-            key: 'map2'
+            key: 'map3'
         });
     }
 
@@ -318,7 +318,8 @@ class map2 extends Phaser.Scene {
         nbBandit = nbBanditParam;
         levelNiveau = levelNiveauParam;
         if( userInBdd.level == levelNiveauParam ||  userInBdd.level -1 == levelNiveauParam )
-            this.scene.start("wanted2");
+            this.scene.start("wanted");
+
     }
 
     enterPointHoverState(button) {

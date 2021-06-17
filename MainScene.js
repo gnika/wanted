@@ -27,6 +27,7 @@ class MainScene extends Phaser.Scene    {
         this.load.image('menu1', 'assets/images/main/menu1.png');
         this.load.image('menu2', 'assets/images/main/menu2.png');
         this.load.image('menu3', 'assets/images/main/menu3.png');
+        this.load.image('jeu', 'assets/images/jeu.png');
 
     }
     create () {
@@ -95,6 +96,15 @@ class MainScene extends Phaser.Scene    {
         this.time.addEvent({
             delay: 3000,                // 3000 ms
             callback: ()=>{
+
+                let sign = this.add.image(400, 100, 'jeu');
+
+                    this.tweens.add({
+                        targets: sign,
+                        y: 160,
+                        ease: 'Bounce.easeOut',
+                        duration: 1000
+                    });
 
                 this.add.image(screenCenterX, screenCenterY - 165, 'menu1');
                 this.add.image(screenCenterX, screenCenterY +160, 'menu3');

@@ -1,9 +1,9 @@
 
 
-class jeu extends Phaser.Scene {
+class jeu2 extends Phaser.Scene {
     constructor() {
         super({
-            key: 'jeu'
+            key: 'jeu2'
         });
     }
 
@@ -19,7 +19,6 @@ class jeu extends Phaser.Scene {
         this.load.image('time', 'assets/images/time.png');
         this.load.image('gold', 'assets/images/gold.png');
         this.load.image('tete_map', 'assets/images/map/tete_map.png');
-        //this.load.image('logo', 'assets/sprites/phaser.png');
         this.load.image('logo', 'assets/images/logo.png');
         this.load.image('red', 'assets/particles/red.png');
         this.load.image('fire', 'assets/particles/lit-smoke.png');
@@ -32,6 +31,7 @@ class jeu extends Phaser.Scene {
         this.load.image('bonus_gold', 'assets/images/bonus_gold.png');
         this.load.image('bonus_pepite', 'assets/images/bonus_pepite.png');
         this.load.image('bandit', 'assets/images/tetes/bandit.png');
+        this.load.image('interdit', 'assets/images/interdit.png');
         this.load.spritesheet('button', 'assets/buttons/button_sprite_sheet.png', {
             frameWidth: 193,
             frameHeight: 71
@@ -49,6 +49,9 @@ class jeu extends Phaser.Scene {
 
         var fond = Phaser.Math.Between(1, 5);
         var decor = this.add.image(400, 400, 'fond'+fond);
+        var graphics = this.add.graphics();
+        graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+        graphics.fillRect(250, 200, 400, 256);
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.level < 10 )
@@ -57,11 +60,11 @@ class jeu extends Phaser.Scene {
                     this.scene.start("map2");
             });
         iconReturn.visible = false;
+
         decor.setInteractive();
         decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
-            if( currentHealth > 0 && nextLevel < 10 )
-                this.time.addEvent({callback: badClick, callbackScope: this});
-            else{
+            if( currentHealth == 0 || nextLevel >= 25 ){
+
                 var pepiteBonus = Math.trunc(currentHealth / 10);
                 var scoreBonus = Math.trunc(currentHealth / 10) * 10;
                 if( this.catchPepite == 1 ){
@@ -83,7 +86,7 @@ class jeu extends Phaser.Scene {
                     userInBdd.timeAdd,
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
-                     pepites,
+                    pepites,
                     userInBdd.entreeChariot
                 );
                 if( userInBdd.level < 10 )
@@ -92,7 +95,6 @@ class jeu extends Phaser.Scene {
                     this.scene.start("map2");
             }
         });
-
 
         var particles = this.add.particles('red');
         this.particlesFind = this.add.particles('fire');
@@ -117,35 +119,7 @@ class jeu extends Phaser.Scene {
         logo.setBounce(1, 1);
         logo.setCollideWorldBounds(true);
 
-        for( var i = 1; i<= nbBandit; i++ ) {
-            this.physics.add.image(300 + i*150, i*150+100, 'bandit').setVelocity(100+i*150, 200+i*150)
-                .setBounce(1, 1)
-                .setCollideWorldBounds(true)
-                .setInteractive()
-                .on('pointerdown', () => {        //quand on clique sur le bandit game over direct
-                    if( nextLevel < 10 )
-                        currentHealth = 0;
-            });
-        }
-
         emitter.startFollow(logo);
-
-        this.tetes = new Array();
-        this.falseTetes = new Array();
-
-        for(var a = 0; a < totalTetes.length; a++) {
-            var falseTete = this.add.image(game.config.width - 150*a, 300+250*a, 'tete'+totalTetes[a]);
-            falseTete.direction = 0;
-            this.falseTetes.push(falseTete);
-        }
-            this.teteWanted = this.add.image(game.config.width - 150, 150, teteWanted);
-        this.teteWanted.direction = 0;
-        this.teteWanted.setInteractive();
-
-        this.teteWanted.on('pointerdown', () => {        //quand on clique sur l'élément recherché
-            this.time.addEvent({callback: actionOnClick, callbackScope: this});
-        });
-
 
         this.dollars = this.add.image(game.config.width - 150, 150, 'dollars');
         this.dollars.direction = 0;
@@ -218,40 +192,66 @@ class jeu extends Phaser.Scene {
             var nbTetesY       = 16;
         }
 
-        if( levelNiveau%2 == 0 ) {
-            var v = -15;
-            var d = 0;
-        }
-        else {//sinusoidal
-            var v = 0;
-            var d = -5;
-        }
+        this.tetes = [];
+        var mainGame = this;
+        for (var a = 0; a < nbTetesX; a++) {
+            var tetRechercheeNumber  = 'tete'+Phaser.Math.Between(1, 4);
 
-        for (var a = v; a < nbTetesX; a++) {
-            for (var i = d; i < nbTetesY; i++) {
-                var imgFalse = this.add.image(a * distanceTetesX, distanceTetesY + (i * distanceTetesY), teteNotWanted);
+            this.tetes[a] = this.add.image(a * distanceTetesX, Phaser.Math.Between(-500, 50), tetRechercheeNumber);
+            this.tetes[a].teteOver = tetRechercheeNumber;
+            this.tetes[a].setInteractive();
 
-                var value = Phaser.Math.Between(0, 10);
-                var sens = Phaser.Math.Between(0, 10);
-                if (value < 5)
-                    imgFalse.rotation += 0.6;
-                if (sens < 5)
-                    imgFalse.sens = 'negatif';
+            this.tetes[a].on('pointerdown', function () {         //quand on clique sur une tete
+                    var tete = this;
 
-                imgFalse.departX = a * distanceTetesX;
-                imgFalse.departY = distanceTetesY + (i * distanceTetesY);
+                if( this.teteOver == teteWanted )
+                    currentHealth = 0;
+                mainGame.time.addEvent({callback: ()=>{
+                        var findSpark = mainGame.particlesFind.createEmitter({
+                            speed: 100,
+                            scale: { start: 1, end: 0 },
+                            blendMode: 'ADD'
+                        });
 
-                this.tetes.push(imgFalse);
-            }
+                        findSpark.startFollow(tete);
+                        tete.visible = false;
+                        nextLevel++;
+
+                        nextLevelText.setText(nextLevel).setShadow(2, 2, cssColors.navy, 8);
+
+                        mainGame.time.addEvent({
+                            delay: 500,
+                            callback: ()=>{
+                                findSpark.on = false;
+                                tete.visible = true;
+                                tete.x= tete.departX;
+                                tete.y= Phaser.Math.Between(-500, 100);
+                            },
+                            loop: false
+                        });
+
+                }, callbackScope: this});
+
+
+            });
+
+            var value = Phaser.Math.Between(0, 10);
+            var sens = Phaser.Math.Between(0, 10);
+            if (value < 5)
+                this.tetes[a].rotation += 0.6;
+            if (sens < 5)
+                this.tetes[a].sens = 'negatif';
+
+            this.tetes[a].departX = a * distanceTetesX;
+            this.tetes[a].departY = 0;
+
         }
 
         //timer
 
         //  So we can see how much health we have left
 
-        text = this.add.text(10, 10, currentHealth,
-            {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
-            .setShadow(2, 2, cssColors.navy, 8);
+
 
         nextLevelText = this.add.text(this.cameras.main.width -120, 10, nextLevel,
             {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
@@ -266,11 +266,13 @@ class jeu extends Phaser.Scene {
                 {fill: cssColors.yellow, fontFamily: "Luckiest Guy", fontSize: 52})
                 .setShadow(2, 2, cssColors.navy, 8);
         });
-        timedEvent = this.time.addEvent({delay: 500, callback: reduceHealth, callbackScope: this, loop: true});
-        var time = this.add.image(130, 40, 'time');
+
+
         var tete_map = this.add.image(game.config.width - 40, 40, 'tete_map');
         var gold = this.add.image(this.cameras.main.width /2 -120, 40, 'gold');
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
+        var interdit = this.add.image(game.config.width/2, game.config.height - 80, 'interdit');
+        interdit.alpha = 0.5;
         var wantedTete = this.add.image(game.config.width/2, game.config.height - 80, bigTeteWanted);
         wantedTete.alpha = 0.5;
 
@@ -327,12 +329,9 @@ class jeu extends Phaser.Scene {
                 pepiteDisplay.setFill('red');
             }
             this.gamover.visible = true;
-            this.teteWanted.destroy();
-            for (var a = 0; a < this.falseTetes.length; a++)
-                this.falseTetes[a].destroy();
 
         }
-        if (nextLevel == 10) {
+        if (nextLevel == 25) {
             this.emitterDollars.on = false;
 
             this.nextlevel.visible = true;
@@ -350,15 +349,8 @@ class jeu extends Phaser.Scene {
                 this.bonusPepite2.setText('X ' + scoreBonus);
             }
 
-
-            this.teteWanted.destroy();
-            timedEvent.remove();
-            for (var a = 0; a < this.falseTetes.length; a++)
-                this.falseTetes[a].destroy();
-
         }
 
-        text.setText(currentHealth).setShadow(2, 2, cssColors.navy, 8);
 
         if (grossirText != null) {  //quand un score est modifié
             if (grossir == 1) {
@@ -376,14 +368,13 @@ class jeu extends Phaser.Scene {
             }
         }
 
-        this.teteWanted.rotation += 0.01;
+
         this.dollars.rotation += 0.2;
-        //console.log(this.tetes[0].x);
+
         for (var i = 0; i < this.tetes.length; i++) {
             var tete = this.tetes[i];
-            if (currentHealth == 0 || nextLevel == 10) {
+            if (currentHealth == 0 || nextLevel == 25) {
                 tete.destroy();
-                this.teteWanted.destroy();
                 this.dollars.destroy();
             } else {
                 if (tete.rotation != 0) {
@@ -393,42 +384,20 @@ class jeu extends Phaser.Scene {
                         tete.rotation += 0.1;
                 }
 
-                tete.x += 2;
-                if (levelNiveau % 2 == 0)
-                    var pattern = 3;//tout droit
-                else
-                    var pattern = 1;//sinusoidal
-                if (positif == pattern)
-                    tete.y += 2;
-                else
-                    tete.y -= 2;
+                var vitesseTete = userInBdd.vitesseEnMoins + 3 + levelNiveau - 10;
+                if( vitesseTete < 3 )
+                    vitesseTete = 3;
+                tete.y += vitesseTete;
 
-                if (tete.x > 800 && levelNiveau % 2 == 1) {
-                    tete.x = -80;
-                    tete.y = tete.departY;
-                }
-                if (tete.y < 0 && levelNiveau % 2 == 0) {
-
-                    tete.x = tete.departX;
-                    tete.y = game.config.height + 240;
+                if (tete.y > game.config.height) {
+                    if( tete.teteOver != teteWanted )
+                        currentHealth = 0;
+                    else
+                        tete.y = tete.departY;
 
                 }
             }
         }
-        var vitesseTete = userInBdd.vitesseEnMoins + 3 + levelNiveau;
-        if( vitesseTete < 3 )
-            vitesseTete = 3;
-        for (var a = 0; a < this.falseTetes.length; a++) {
-            if (this.falseTetes[a].direction == 0)
-                this.falseTetes[a].x -= vitesseTete;
-            else
-                this.falseTetes[a].x += vitesseTete;
-        }
-
-        if( this.teteWanted.direction == 0 )
-            this.teteWanted.x -= vitesseTete;
-        else
-            this.teteWanted.x += vitesseTete;
 
         if( this.dollars.direction == 0 )
             this.dollars.x -= 6 + levelNiveau;
@@ -442,48 +411,13 @@ class jeu extends Phaser.Scene {
 
         if (positif == 1) {
             this.dollars.y -= 2;
-            this.teteWanted.y += 2;
             if( this.pepite )
                 this.pepite.y -= 2;
         }
         else {
             this.dollars.y += 2;
-            this.teteWanted.y -= 2;
             if( this.pepite )
                 this.pepite.y += 2;
-        }
-
-        for (var a = 0; a < this.falseTetes.length; a++) {
-            if (this.falseTetes[a].x < 0 || this.falseTetes[a].x > game.config.width) {
-                var value1 = Phaser.Math.Between(0, 10);
-
-                if (value1 >= 5) {
-                    this.falseTetes[a].direction = 0;
-                    this.falseTetes[a].x = game.config.width - 50;
-                } else {
-                    this.falseTetes[a].direction = 1;
-                    this.falseTetes[a].x = 50;
-                }
-
-                var value = Phaser.Math.Between(0, 900);
-                this.falseTetes[a].y = value;
-            }
-        }
-
-        if (this.teteWanted.x < 0 ||  this.teteWanted.x > game.config.width ) {
-            var value1 = Phaser.Math.Between(0, 10);
-
-            if( value1 >= 5 ) {
-                this.teteWanted.direction = 0;
-                this.teteWanted.x = game.config.width - 50;
-            }
-            else {
-                this.teteWanted.direction = 1;
-                this.teteWanted.x = 50;
-            }
-
-            var value = Phaser.Math.Between(0, 900);
-            this.teteWanted.y = value;
         }
 
         if (this.dollars.x < 0 ||  this.dollars.x > game.config.width ) {
@@ -509,6 +443,10 @@ class jeu extends Phaser.Scene {
 
         if (augmente <= -60)
             positif = 1;
+
+    }
+
+    changeTete(imgFalse){
 
     }
 

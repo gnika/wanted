@@ -58,7 +58,7 @@ class map extends Phaser.Scene {
                 .on('pointerdown', () => this.scene.start("map2"));
         }
 
-        this.saloonHover = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon_open').setInteractive()
+        this.saloonHover = this.add.image(game.config.width - 300, game.config.height - 300, 'saloon_open').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.entreeSaloon == 0 ) {
                     var dialog = this.rexUI.add.dialog({
@@ -200,7 +200,7 @@ class map extends Phaser.Scene {
             .on('pointerover', () => this.saloon)
             .on('pointerout', () => this.saloon.visible = true);
 
-        this.saloon = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon').setInteractive()
+        this.saloon = this.add.image(game.config.width - 300, game.config.height - 300, 'saloon').setInteractive()
             .on('pointerover', () => this.saloon.visible = false);
 
         this.chariotHover = this.add.image(370, 400, 'chariot_open').setInteractive()
