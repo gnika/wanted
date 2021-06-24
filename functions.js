@@ -1,5 +1,6 @@
 //STORE-UPDATE DATABASE USER
-function writeUserData(userId, name, email, imageUrl, level, score, entreeSaloon, timeAdd, recompenseAdd, vitesseEnMoins, pepite, entreeChariot) {
+function writeUserData(userId, name, email, imageUrl, level, score, entreeSaloon, timeAdd, recompenseAdd,
+                       vitesseEnMoins, pepite, entreeChariot, entreeMagasin2, dynamite, vie, onetouchtwomatch) {
     firebase.database().ref('users/' + userId).set({
         username: name,
         email: email,
@@ -11,7 +12,11 @@ function writeUserData(userId, name, email, imageUrl, level, score, entreeSaloon
         recompenseAdd : recompenseAdd,
         vitesseEnMoins : vitesseEnMoins,
         pepite : pepite,
-        entreeChariot : entreeChariot
+        entreeChariot : entreeChariot,
+        entreeMagasin2 : entreeMagasin2,
+        dynamite : dynamite,
+        vie : vie,
+        onetouchtwomatch : onetouchtwomatch
     });
 }
 
@@ -75,6 +80,9 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
         if( nextLevel == 10 && levelNiveau == userInBdd.level )
             userInBdd.level++;
 
+        if( nextLevel == 10 && userInBdd.level >=20 && levelNiveau == userInBdd.level -10 )
+            userInBdd.level++;
+
         writeUserData(
             userConnected.uid,
             userConnected.displayName,
@@ -87,12 +95,16 @@ function actionOnClick () { //quand on clique sur la tête qu'on doit trouver
             userInBdd.recompenseAdd,
             userInBdd.vitesseEnMoins,
             userInBdd.pepite,
-            userInBdd.entreeChariot
+            userInBdd.entreeChariot,
+            userInBdd.entreeMagasin2,
+            userInBdd.dynamite,
+            userInBdd.vie,
+            userInBdd.onetouchtwomatch
         );
 
     });
 
-    nextLevelText.setText(nextLevel).setShadow(2, 2, cssColors.navy, 8);
+    nextLevelText.setText(nextLevel);
 
     this.time.addEvent({
         delay: 500,
@@ -158,7 +170,11 @@ function actionDollars  () { //quand on clique sur les dollars
             userInBdd.recompenseAdd,
             userInBdd.vitesseEnMoins,
             userInBdd.pepite,
-            userInBdd.entreeChariot
+            userInBdd.entreeChariot,
+            userInBdd.entreeMagasin2,
+            userInBdd.dynamite,
+            userInBdd.vie,
+            userInBdd.onetouchtwomatch
         );
 
     });

@@ -58,6 +58,7 @@ class map extends Phaser.Scene {
                 .on('pointerdown', () => this.scene.start("map2"));
         }
 
+        /*
         this.saloonHover = this.add.image(game.config.width - 300, game.config.height - 300, 'saloon_open').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.entreeSaloon == 0 ) {
@@ -130,7 +131,11 @@ class map extends Phaser.Scene {
                                         userInBdd.recompenseAdd,
                                         userInBdd.vitesseEnMoins,
                                         userInBdd.pepite,
-                                         userInBdd.entreeChariot
+                                         userInBdd.entreeChariot,
+                                        userInBdd.entreeMagasin2,
+                                            userInBdd.dynamite,
+                                            userInBdd.vie,
+                                            userInBdd.onetouchtwomatch
                                      );
                                      scoreDisplay.setText(userInBdd.score);
                                      
@@ -202,7 +207,7 @@ class map extends Phaser.Scene {
 
         this.saloon = this.add.image(game.config.width - 300, game.config.height - 300, 'saloon').setInteractive()
             .on('pointerover', () => this.saloon.visible = false);
-
+*/
         this.chariotHover = this.add.image(370, 400, 'chariot_open').setInteractive()
             .on('pointerdown', () => {
                 if( userInBdd.entreeChariot == 0 ) {
@@ -275,7 +280,11 @@ class map extends Phaser.Scene {
                                         userInBdd.recompenseAdd,
                                         userInBdd.vitesseEnMoins,
                                         userInBdd.pepite - 3,
-                                         1
+                                         1,
+                                        userInBdd.entreeMagasin2,
+                                            userInBdd.dynamite,
+                                            userInBdd.vie,
+                                            userInBdd.onetouchtwomatch
                                      );
                                      pepiteDisplay.setText(userInBdd.pepite);
 

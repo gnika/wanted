@@ -1,21 +1,23 @@
 
 
 
-class map3 extends Phaser.Scene {
+class map4 extends Phaser.Scene {
     constructor() {
         super({
-            key: 'map3'
+            key: 'map4'
         });
     }
 
     preload() {
-        this.load.image('map3', 'assets/images/map/map3.png');
+        this.load.image('map4', 'assets/images/map/map4.png');
         this.load.image('level', 'assets/images/map/level.png');
         this.load.image('level_done', 'assets/images/map/level_done.png');
         this.load.image('level_precedent', 'assets/images/map/level_precedent.png');
         this.load.image('tete_map', 'assets/images/map/tete_map.png');
         this.load.image('return', 'assets/images/return.png');
         this.load.image('saloon', 'assets/images/map/saloon.png');
+        this.load.image('store', 'assets/images/map/store.png');
+        this.load.image('store_open', 'assets/images/map/store_open.png');
         this.load.image('saloon_open', 'assets/images/map/saloon_open.png');
         this.load.image('chariot', 'assets/images/map/chariot.png');
         this.load.image('chariot_open', 'assets/images/map/chariot_open.png');
@@ -38,7 +40,7 @@ class map3 extends Phaser.Scene {
             }
         });
 
-        var decor = this.add.image(game.config.width/2, game.config.height/2, 'map3');
+        var decor = this.add.image(game.config.width/2, game.config.height/2, 'map4');
         var decor = this.add.image( 250, 120, 'fond_or');
 
         scoreDisplay = this.add.text(270, 85, userInBdd.score,
@@ -50,19 +52,9 @@ class map3 extends Phaser.Scene {
             .setShadow(2, 2, cssColors.navy, 8);
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
 
-        if( userInBdd.level <= 29 ){
-            this.add.image(game.config.width/2 + 240, 80, 'next_off');
-        }
-        else{
-            this.add.image(game.config.width/2 + 240, 80, 'next_on').setInteractive()
-                .on('pointerdown', () => this.scene.start("map4"));
-        }
-
-
-
-        this.chariotHover = this.add.image(370, 400, 'chariot_open').setInteractive()
+        this.shopHover = this.add.image(350, 400, 'store_open').setInteractive()
             .on('pointerdown', () => {
-                if( userInBdd.entreeChariot == 0 || userInBdd.entreeChariot == 1 ) {
+                if( userInBdd.entreeMagasin2 < 2 ) {
                     var dialog = this.rexUI.add.dialog({
                         x: 400,
                         y: 300,
@@ -71,7 +63,7 @@ class map3 extends Phaser.Scene {
 
                         title: this.rexUI.add.label({
                             background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
-                            text: this.add.text(50, 0, 'Chariot', {
+                            text: this.add.text(50, 0, 'Store', {
                                 fontSize: '24px', fontFamily: "Luckiest Guy"
                             }),
                             space: {
@@ -83,7 +75,7 @@ class map3 extends Phaser.Scene {
                         }),
 
                         content:
-                            this.add.text(0, 0, '45000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
+                            this.add.text(0, 0, '50000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
 
                         ,
 
@@ -119,31 +111,31 @@ class map3 extends Phaser.Scene {
                         .on('button.click', function (button, groupName, index) {
                             //this.print.text += index + ': ' + button.text + '\n';
                             if (index == 0) {//yes
-                                if (userInBdd.score >= 45000) {
+                                if (userInBdd.score >= 50000) {
                                     writeUserData(
                                         userConnected.uid,
                                         userConnected.displayName,
                                         userConnected.email,
                                         userConnected.photoURL,
                                         userInBdd.level,
-                                        userInBdd.score - 40000,
+                                        userInBdd.score - 50000,
                                         userInBdd.entreeSaloon,
                                         userInBdd.timeAdd,
                                         userInBdd.recompenseAdd,
                                         userInBdd.vitesseEnMoins,
                                         userInBdd.pepite,
+                                        userInBdd.entreeChariot,
                                         2,
-                                        userInBdd.entreeMagasin2,
                                         userInBdd.dynamite,
                                         userInBdd.vie,
                                         userInBdd.onetouchtwomatch
                                     );
                                     scoreDisplay.setText(userInBdd.score);
 
-                                    userInBdd.entreeChariot = 2;
+                                    userInBdd.entreeMagasin2 = 2;
                                     dialog.visible = false;
                                     var emitter0 = this.add.particles('spark0').createEmitter({
-                                        x: 370,
+                                        x: 350,
                                         y: 400,
                                         speed: {min: -800, max: 800},
                                         angle: {min: 0, max: 360},
@@ -155,8 +147,8 @@ class map3 extends Phaser.Scene {
                                     });
 
                                     var emitter1 = this.add.particles('spark1').createEmitter({
-                                        x: 200,
-                                        y: 300,
+                                        x: 350,
+                                        y: 400,
                                         speed: {min: -800, max: 800},
                                         angle: {min: 0, max: 360},
                                         scale: {start: 0.3, end: 0},
@@ -199,25 +191,25 @@ class map3 extends Phaser.Scene {
                             button.getElement('background').setStrokeStyle();
                         });
                 }else{
-                    this.scene.start("shop3");
+                    this.scene.start("shop4");
                 }
 
             })
-            .on('pointerover', () => this.chariot)
-            .on('pointerout', () => this.chariot.visible = true);
+            .on('pointerover', () => this.shop4)
+            .on('pointerout', () => this.shop4.visible = true);
 
-        this.chariot = this.add.image(370, 400, 'chariot').setInteractive()
-            .on('pointerover', () => this.chariot.visible = false);
+        this.shop4 = this.add.image(350, 400, 'store').setInteractive()
+            .on('pointerover', () => this.shop4.visible = false);
 
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("map2"));
+            .on('pointerdown', () => this.scene.start("map3"));
 
         currentHealth = 50 + userInBdd.timeAdd;
         nextLevel     = 0;
 
 
-        for (var i = 20; i <= 29; i++){
+        for (var i = 30; i <= 39; i++){
             if( userInBdd.level >= i )
                 var img = 'level_done';
             else
@@ -227,70 +219,70 @@ class map3 extends Phaser.Scene {
             var Ylevel = 0;
             var bandits = 0;
 
-            if( i == 20 ){
+            if( i == 30 ){
                 Xlevel = game.config.width / 2 + 135;
                 Ylevel = game.config.height - 120;
                 var bandits = 2;
                 this.pointMap0 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 21 ){
-                Xlevel = game.config.width / 2 - 150;
+            if( i == 31 ){
+                Xlevel = game.config.width / 2 - 50;
                 Ylevel = game.config.height - 130;
                 var bandits = 3;
                 this.pointMap1 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 22 ){
+            if( i == 32 ){
                 Xlevel = 180;
-                Ylevel = game.config.height - 250;
+                Ylevel = game.config.height - 200;
                 var bandits = 3;
                 this.pointMap2 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 23 ){
+            if( i == 33 ){
                 Xlevel = 280;
                 Ylevel = game.config.height - 340;
                 var bandits = 3;
                 this.pointMap3 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 24 ){
-                Xlevel = 400;
-                Ylevel = game.config.height - 465;
+            if( i == 34 ){
+                Xlevel = 430;
+                Ylevel = game.config.height - 430;
                 var bandits = 4;
                 this.pointMap4 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 25 ){
-                Xlevel = 200;
-                Ylevel = game.config.height - 540;
+            if( i == 35 ){
+                Xlevel = 310;
+                Ylevel = game.config.height - 490;
                 var bandits = 4;
                 this.pointMap5 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 26 ){
+            if( i == 36 ){
                 Xlevel = 190;
                 Ylevel = game.config.height - 700;
                 var bandits = 4;
                 this.pointMap6 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 27 ){
-                Xlevel = 580;
+            if( i == 37 ){
+                Xlevel = 500;
                 Ylevel = game.config.height - 700;
                 var bandits = 5;
                 this.pointMap7 = this.add.image(Xlevel, Ylevel, img);
             }
 
-            if( i == 28 ){
+            if( i == 38 ){
                 Xlevel = 600;
                 Ylevel = game.config.height - 850;
                 var bandits = 5;
                 this.pointMap8 = this.add.image(Xlevel , Ylevel, img);
             }
 
-            if( i == 29 ){
+            if( i == 39 ){
                 Xlevel = 445;
                 Ylevel = game.config.height - 860;
                 var bandits = 6;
@@ -298,7 +290,7 @@ class map3 extends Phaser.Scene {
             }
 
             if( userInBdd.level == i ) {
-                var niveau = i ;
+                var niveau = i;
                 var banditsParam = bandits;
                 this.teteHead = this.add.image(Xlevel, Ylevel, 'tete_map')
                     .setInteractive()
@@ -309,8 +301,8 @@ class map3 extends Phaser.Scene {
                     .on('pointerout', () => this.enterPointRestState(this.teteHead));
             }
 
-            if( userInBdd.level -1 == i ) {
-                var niveauPrecedent = i;
+            if( userInBdd.level - 10 -1 == i ) {
+                var niveauPrecedent = i + 10;
                 var banditsParamPrecedent = bandits;
                 this.teteHead = this.add.image(Xlevel, Ylevel, 'level_precedent')
                     .setInteractive()
@@ -331,9 +323,9 @@ class map3 extends Phaser.Scene {
     passWanted( nbBanditParam, levelNiveauParam) {
         nbBandit = nbBanditParam;
         levelNiveau = levelNiveauParam - 10;
+        teteBonus            = 0;
         if( userInBdd.level == levelNiveauParam ||  userInBdd.level -1 == levelNiveauParam )
-            this.scene.start("wanted");
-
+            this.scene.start("wanted2");
     }
 
     enterPointHoverState(button) {

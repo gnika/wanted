@@ -34,7 +34,9 @@ class wanted2 extends Phaser.Scene {
             }
         }
 
-        var tetRecherchee        = 'bigtete'+tetRechercheeNumber;
+        bonusTete            = get_random(toutesLesTetes);
+        teteBonus            = 0;
+        var tetRecherchee    = 'bigtete'+tetRechercheeNumber;
 
         var decor = this.add.image(400, 600, 'fondWanted')
             .setInteractive()
@@ -53,7 +55,9 @@ class wanted2 extends Phaser.Scene {
             callback: ()=>{
                 this.addWanted = 1;
                 this.imageWanted  =  this.add.sprite(game.config.width / 2, game.config.height / 2, 'wanted');
-
+                this.bandit = this.add.sprite(this.cameras.main.width / 2 - 100,  70, 'tete'+bonusTete);
+                this.textBonus = this.add.text(50,  50, 'BONUS',
+                    {fill: "brown", fontFamily: "Luckiest Guy", fontSize: 52});
 
                 if( levelNiveau > 10 )var nbPepit = 1;else nbPepit = 0;
                 this.nbPepiteDisplay = this.add.text(this.cameras.main.width / 2 + 100,  50, nbPepit,
@@ -61,12 +65,14 @@ class wanted2 extends Phaser.Scene {
                 this.pepiteDisplay = this.add.sprite(this.cameras.main.width / 2 + 200 ,  70, 'pepite');
                 this.pepiteDisplay.visible = false;
                 this.nbPepiteDisplay.visible = false;
+                this.bandit.visible = false;
+                this.textBonus.visible = false;
 
             },
             loop: false
         });
 
-        var headScores = levelNiveau * 50;
+        var headScores = levelNiveau * 5;//recompense par tete
         if( headScores == 0 )
             headScores = 50;
 
@@ -98,6 +104,9 @@ class wanted2 extends Phaser.Scene {
 
                 this.rewDisplay.visible = true;
                 this.goldDisplay.visible = true;
+
+                this.bandit.visible = true;
+                this.textBonus.visible = true;
 
             }
         }

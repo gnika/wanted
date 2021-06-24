@@ -16,6 +16,8 @@ class map2 extends Phaser.Scene {
         this.load.image('tete_map', 'assets/images/map/tete_map.png');
         this.load.image('return', 'assets/images/return.png');
         this.load.image('saloon', 'assets/images/map/saloon.png');
+        this.load.image('store', 'assets/images/map/store.png');
+        this.load.image('store_open', 'assets/images/map/store_open.png');
         this.load.image('saloon_open', 'assets/images/map/saloon_open.png');
         this.load.image('chariot', 'assets/images/map/chariot.png');
         this.load.image('chariot_open', 'assets/images/map/chariot_open.png');
@@ -50,9 +52,17 @@ class map2 extends Phaser.Scene {
             .setShadow(2, 2, cssColors.navy, 8);
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
 
-        this.saloonHover = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon_open').setInteractive()
+        if( userInBdd.level <= 19 ){
+            this.add.image(game.config.width/2 + 240, 80, 'next_off');
+        }
+        else{
+            this.add.image(game.config.width/2 + 240, 80, 'next_on').setInteractive()
+                .on('pointerdown', () => this.scene.start("map3"));
+        }
+
+        this.shopHover = this.add.image(game.config.width - 130, game.config.height - 400, 'store_open').setInteractive()
             .on('pointerdown', () => {
-                if( userInBdd.entreeSaloon == 0 ) {
+                if( userInBdd.entreeMagasin2 == 0 ) {
                     var dialog = this.rexUI.add.dialog({
                         x: 400,
                         y: 300,
@@ -61,7 +71,7 @@ class map2 extends Phaser.Scene {
 
                         title: this.rexUI.add.label({
                             background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
-                            text: this.add.text(50, 0, 'Saloon', {
+                            text: this.add.text(50, 0, 'Store', {
                                 fontSize: '24px', fontFamily: "Luckiest Guy"
                             }),
                             space: {
@@ -73,7 +83,7 @@ class map2 extends Phaser.Scene {
                         }),
 
                         content:
-                            this.add.text(0, 0, '1000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
+                            this.add.text(0, 0, '40000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
 
                         ,
 
@@ -109,28 +119,32 @@ class map2 extends Phaser.Scene {
                         .on('button.click', function (button, groupName, index) {
                             //this.print.text += index + ': ' + button.text + '\n';
                             if (index == 0) {//yes
-                                if (userInBdd.score >= 1000) {
+                                if (userInBdd.score >= 40000) {
                                     writeUserData(
                                         userConnected.uid,
                                         userConnected.displayName,
                                         userConnected.email,
                                         userConnected.photoURL,
                                         userInBdd.level,
-                                        userInBdd.score - 1000,
-                                        1,
+                                        userInBdd.score - 40000,
+                                        userInBdd.entreeSaloon,
                                         userInBdd.timeAdd,
                                         userInBdd.recompenseAdd,
                                         userInBdd.vitesseEnMoins,
                                         userInBdd.pepite,
-                                        userInBdd.entreeChariot
+                                        userInBdd.entreeChariot,
+                                        1,
+                                        userInBdd.dynamite,
+                                        userInBdd.vie,
+                                        userInBdd.onetouchtwomatch
                                     );
                                     scoreDisplay.setText(userInBdd.score);
 
-                                    userInBdd.entreeSaloon = 1;
+                                    userInBdd.entreeMagasin2 = 1;
                                     dialog.visible = false;
                                     var emitter0 = this.add.particles('spark0').createEmitter({
-                                        x: game.config.width - 200,
-                                        y: game.config.height - 300,
+                                        x: game.config.width - 150,
+                                        y: game.config.height - 400,
                                         speed: {min: -800, max: 800},
                                         angle: {min: 0, max: 360},
                                         scale: {start: 0.5, end: 0},
@@ -141,8 +155,8 @@ class map2 extends Phaser.Scene {
                                     });
 
                                     var emitter1 = this.add.particles('spark1').createEmitter({
-                                        x: game.config.width - 200,
-                                        y: game.config.height - 300,
+                                        x: game.config.width - 150,
+                                        y: game.config.height - 400,
                                         speed: {min: -800, max: 800},
                                         angle: {min: 0, max: 360},
                                         scale: {start: 0.3, end: 0},
@@ -185,15 +199,15 @@ class map2 extends Phaser.Scene {
                             button.getElement('background').setStrokeStyle();
                         });
                 }else{
-                    this.scene.start("saloon");
+                    this.scene.start("shop2");
                 }
 
             })
-            .on('pointerover', () => this.saloon)
-            .on('pointerout', () => this.saloon.visible = true);
+            .on('pointerover', () => this.shop2)
+            .on('pointerout', () => this.shop2.visible = true);
 
-        this.saloon = this.add.image(game.config.width - 200, game.config.height - 300, 'saloon').setInteractive()
-            .on('pointerover', () => this.saloon.visible = false);
+        this.shop2 = this.add.image(game.config.width - 130, game.config.height - 400, 'store').setInteractive()
+            .on('pointerover', () => this.shop2.visible = false);
 
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
@@ -317,6 +331,7 @@ class map2 extends Phaser.Scene {
     passWanted( nbBanditParam, levelNiveauParam) {
         nbBandit = nbBanditParam;
         levelNiveau = levelNiveauParam;
+        teteBonus            = 0;
         if( userInBdd.level == levelNiveauParam ||  userInBdd.level -1 == levelNiveauParam )
             this.scene.start("wanted2");
     }

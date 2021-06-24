@@ -11,16 +11,17 @@ class jeu2 extends Phaser.Scene {
         //this.load.setBaseURL('http://labs.phaser.io');
 
         this.load.image('sky', 'assets/skies/space3.png');
-        this.load.image('fond1', 'assets/images/decors/fond1.jpg');
-        this.load.image('fond2', 'assets/images/decors/fond2.jpg');
-        this.load.image('fond3', 'assets/images/decors/fond3.jpg');
-        this.load.image('fond4', 'assets/images/decors/fond4.jpg');
-        this.load.image('fond5', 'assets/images/decors/fond5.jpg');
+        this.load.image('fond1', 'assets/images/decors/fond6.png');
+        this.load.image('fond2', 'assets/images/decors/fond7.jpg');
+        this.load.image('fond3', 'assets/images/decors/fond8.jpg');
+        this.load.image('fond4', 'assets/images/decors/fond9.jpg');
+        this.load.image('fond5', 'assets/images/decors/fond10.jpg');
         this.load.image('time', 'assets/images/time.png');
         this.load.image('gold', 'assets/images/gold.png');
         this.load.image('tete_map', 'assets/images/map/tete_map.png');
         this.load.image('logo', 'assets/images/logo.png');
         this.load.image('red', 'assets/particles/red.png');
+        this.load.image('particulegold', 'assets/particles/green.png');
         this.load.image('fire', 'assets/particles/lit-smoke.png');
         this.load.image('return', 'assets/images/return.png');
         this.load.image('particuleDollars', 'assets/particles/flame1.png');
@@ -31,6 +32,9 @@ class jeu2 extends Phaser.Scene {
         this.load.image('bonus_gold', 'assets/images/bonus_gold.png');
         this.load.image('bonus_pepite', 'assets/images/bonus_pepite.png');
         this.load.image('bandit', 'assets/images/tetes/bandit.png');
+        this.load.image('interdit', 'assets/images/interdit.png');
+        this.load.image('dynamite', 'assets/images/dynamite.png');
+        this.load.image('sherif', 'assets/images/sherif.png');
         this.load.image('interdit', 'assets/images/interdit.png');
         this.load.spritesheet('button', 'assets/buttons/button_sprite_sheet.png', {
             frameWidth: 193,
@@ -46,33 +50,48 @@ class jeu2 extends Phaser.Scene {
         //on passe par la pour les dollars car il ne doit pas réapparaitre tout de suite
         this.emitterEventDollars = new Phaser.Events.EventEmitter();
         this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
+        this.vies = userInBdd.vie;
 
         var fond = Phaser.Math.Between(1, 5);
         var decor = this.add.image(400, 400, 'fond'+fond);
         var graphics = this.add.graphics();
-        graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
-        graphics.fillRect(250, 200, 400, 256);
+        graphics.fillGradientStyle(0xffff00, 0xffff00, 0xff0000, 0xff0000, 1);
+        graphics.fillRect(0, 700, game.config.width, 400);
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
             .on('pointerdown', () => {
-                if( userInBdd.level < 10 )
-                    this.scene.start("map");
-                else
+                if( userInBdd.level < 20 )
                     this.scene.start("map2");
+                else
+                    this.scene.start("map4");
             });
         iconReturn.visible = false;
 
         decor.setInteractive();
-        decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
+        decor.on('pointerdown', () => {        //quand on clique sur le decors
             if( currentHealth == 0 || nextLevel >= 25 ){
 
-                var pepiteBonus = Math.trunc(currentHealth / 10);
-                var scoreBonus = Math.trunc(currentHealth / 10) * 10;
+                var pepiteBonus = teteBonus;
+                var scoreBonus = teteBonus * 10;
                 if( this.catchPepite == 1 ){
                     var pepites = userInBdd.pepite + this.catchPepite + pepiteBonus;
                     var score = userInBdd.score;
                 }else{
                     var pepites = userInBdd.pepite;
                     var score = userInBdd.score + scoreBonus;
+                }
+
+                if( nextLevel >= 25 ) {
+                    if(userInBdd.level == 39) {
+                        userInBdd.level = 0;
+                        userInBdd.entreeChariot = 0;
+                        userInBdd.entreeMagasin2 = 0;
+                        userInBdd.onetouchtwomatch = 0;
+                        userInBdd.timeAdd = 0;
+                        userInBdd.vitesseEnMoins = 0;
+                        userInBdd.dynamite = 0;
+                    }
+                    else
+                        userInBdd.level++;
                 }
 
                 writeUserData(
@@ -87,17 +106,24 @@ class jeu2 extends Phaser.Scene {
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
                     pepites,
-                    userInBdd.entreeChariot
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite,
+                    userInBdd.vie,
+                    userInBdd.onetouchtwomatch
                 );
-                if( userInBdd.level < 10 )
+                if (userInBdd.level == 0)
                     this.scene.start("map");
-                else
+                else if( userInBdd.level < 20 )
                     this.scene.start("map2");
+                else
+                    this.scene.start("map4");
             }
         });
 
         var particles = this.add.particles('red');
         this.particlesFind = this.add.particles('fire');
+        this.particlesFindBonus = this.add.particles('particulegold');
         this.particlesDollars = this.add.particles('particuleDollars');
         this.particlesPepite = this.add.particles('particlesPepite');
 
@@ -132,7 +158,7 @@ class jeu2 extends Phaser.Scene {
 ////////////////////
         this.catchPepite = 0;//ajout de la pépite seulement si le niveau est fini
             this.time.addEvent({    //Apparition des pepites, une seule par partie
-            delay: Phaser.Math.Between(3000, currentHealth*1000),
+            delay: Phaser.Math.Between(3000, 10000),
             //delay: Phaser.Math.Between(3000, 3001),
             callback: () => {
                 if( nextLevel != 10 && currentHealth > 0 && levelNiveau > 1 ) {
@@ -188,30 +214,83 @@ class jeu2 extends Phaser.Scene {
         else {
             var distanceTetesX = 80;
             var distanceTetesY = 81;
-            var nbTetesX       = 11;
+            var nbTetesX       = 10;
             var nbTetesY       = 16;
         }
 
         this.tetes = [];
         var mainGame = this;
-        for (var a = 0; a < nbTetesX; a++) {
-            var tetRechercheeNumber  = 'tete'+Phaser.Math.Between(1, 4);
 
-            this.tetes[a] = this.add.image(a * distanceTetesX, Phaser.Math.Between(-500, 50), tetRechercheeNumber);
+        this.life = [];
+        for (var a = 0; a < userInBdd.vie; a++) {
+            this.life[a] = this.add.image(50, a * 150 + 200 , 'sherif');
+        }
+
+        for (var a = 1; a < nbTetesX; a++) {
+            var tetRechercheeNumber  = 'tete'+Phaser.Math.Between(1, 4);
+            var distanceTetesX2 = 10;
+            this.tetes[a] = this.add.image(a * distanceTetesX + distanceTetesX2, Phaser.Math.Between(-500, 50), tetRechercheeNumber);
             this.tetes[a].teteOver = tetRechercheeNumber;
+            this.tetes[a].number = a;
             this.tetes[a].setInteractive();
 
             this.tetes[a].on('pointerdown', function () {         //quand on clique sur une tete
+
                     var tete = this;
 
                 if( this.teteOver == teteWanted )
                     currentHealth = 0;
-                mainGame.time.addEvent({callback: ()=>{
-                        var findSpark = mainGame.particlesFind.createEmitter({
-                            speed: 100,
-                            scale: { start: 1, end: 0 },
-                            blendMode: 'ADD'
+                if( this.teteOver == 'tete'+bonusTete )
+                    teteBonus ++;
+
+                if( userInBdd.onetouchtwomatch == 1 ) { //on en prends 2 pour 1 mais ca n'incremente pas les pv les bonus et l'argent
+                    var next = tete.number + 1;
+
+                    if( touteslestetes.length > next ) {
+
+                        mainGame.time.addEvent({
+                            callback: () => {
+
+                                var findSpark = mainGame.particlesFind.createEmitter({
+                                    speed: 100,
+                                    scale: {start: 1, end: 0},
+                                    blendMode: 'ADD'
+                                });
+
+                                findSpark.startFollow(touteslestetes[next]);
+                                touteslestetes[next].visible = false;
+
+                                mainGame.time.addEvent({
+                                    delay: 500,
+                                    callback: () => {
+                                        findSpark.on = false;
+                                        touteslestetes[next].visible = true;
+                                        touteslestetes[next].x = tete.departX;
+                                        touteslestetes[next].y = Phaser.Math.Between(-500, 100);
+                                    },
+                                    loop: false
+                                });
+
+
+                            }, callbackScope: this
                         });
+                    }
+
+                }
+                mainGame.time.addEvent({callback: ()=>{
+
+                        if( this.teteOver == 'tete'+bonusTete )
+                            var findSpark = mainGame.particlesFindBonus.createEmitter({
+                                speed: 100,
+                                scale: { start: 1, end: 0 },
+                                blendMode: 'ADD'
+                            });
+                        else
+                            var findSpark = mainGame.particlesFind.createEmitter({
+                                speed: 100,
+                                scale: { start: 1, end: 0 },
+                                blendMode: 'ADD'
+                            });
 
                         findSpark.startFollow(tete);
                         tete.visible = false;
@@ -230,6 +309,29 @@ class jeu2 extends Phaser.Scene {
                             loop: false
                         });
 
+                        var ptVictoire = headScore + userInBdd.score;
+
+                        scoreDisplay.setText(ptVictoire);
+                        grossirText = scoreDisplay;
+                        writeUserData(
+                            userConnected.uid,
+                            userConnected.displayName,
+                            userConnected.email,
+                            userConnected.photoURL,
+                            userInBdd.level,
+                            ptVictoire,
+                            userInBdd.entreeSaloon,
+                            userInBdd.timeAdd,
+                            userInBdd.recompenseAdd,
+                            userInBdd.vitesseEnMoins,
+                            userInBdd.pepite,
+                            userInBdd.entreeChariot,
+                            userInBdd.entreeMagasin2,
+                            userInBdd.dynamite,
+                            userInBdd.vie,
+                            userInBdd.onetouchtwomatch
+                        );
+
                 }, callbackScope: this});
 
 
@@ -247,9 +349,48 @@ class jeu2 extends Phaser.Scene {
 
         }
 
-        //timer
+        var touteslestetes = this.tetes;
+        this.dynamite = [];
+        for (var a = 0; a < userInBdd.dynamite; a++) {//-15000, 50
+            this.dynamite[a] = this.add.image(Phaser.Math.Between(50, this.cameras.main.width), Phaser.Math.Between(-15000, 50) , 'dynamite');
+            this.dynamite[a].setInteractive();
 
-        //  So we can see how much health we have left
+            this.dynamite[a].on('pointerdown', function () {         //quand on clique sur une dynamite
+
+
+                var findSpark = mainGame.particlesFind.createEmitter({
+                    speed: 100,
+                    scale: { start: 10, end: 0 },
+                    blendMode: 'ADD'
+                });
+
+                findSpark.startFollow(this);
+                this.visible = false;
+
+                for (var i = 1; i < touteslestetes.length; i++) {
+                    var tete = touteslestetes[i];
+                    if( tete.y > 50 ) {
+                        tete.x = tete.departX;
+                        tete.y = Phaser.Math.Between(-500, 100);
+
+                        nextLevel++;
+
+                        nextLevelText.setText(nextLevel);
+                        if( tete.teteOver == 'tete'+bonusTete )
+                            teteBonus ++;
+                    }
+                }
+
+                mainGame.time.addEvent({
+                    delay: 500,
+                    callback: ()=>{
+                        findSpark.on = false;
+                    },
+                    loop: false
+                });
+
+            });
+        }
 
 
 
@@ -322,7 +463,11 @@ class jeu2 extends Phaser.Scene {
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
                     0,
-                    userInBdd.entreeChariot
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite,
+                    userInBdd.vie,
+                    userInBdd.onetouchtwomatch
                 );
                 this.emitterDollars.on = false;
                 pepiteDisplay.setText(0);
@@ -331,13 +476,13 @@ class jeu2 extends Phaser.Scene {
             this.gamover.visible = true;
 
         }
-        if (nextLevel == 25) {
+        if (nextLevel >= 25) {
             this.emitterDollars.on = false;
 
             this.nextlevel.visible = true;
 
-            var pepiteBonus = Math.trunc(currentHealth / 10);
-            var scoreBonus = Math.trunc(currentHealth / 10) * 10;
+            var pepiteBonus = teteBonus;
+            var scoreBonus = teteBonus * 10;
             this.bonusPepite.visible = true;
             this.bonusPepite2.visible = true;
             if( this.catchPepite == 1) {
@@ -371,9 +516,21 @@ class jeu2 extends Phaser.Scene {
 
         this.dollars.rotation += 0.2;
 
-        for (var i = 0; i < this.tetes.length; i++) {
+        var vitesseTete = userInBdd.vitesseEnMoins + 3 + levelNiveau - 10;
+        if( vitesseTete < 3 )
+            vitesseTete = 3;
+
+
+        for (var i = 0; i < this.dynamite.length; i++) {
+            var dynamite = this.dynamite[i];
+            dynamite.y += vitesseTete;
+            if (dynamite.y > game.config.height)
+                dynamite.y = game.config.height+100;
+        }
+
+        for (var i = 1; i < this.tetes.length; i++) {
             var tete = this.tetes[i];
-            if (currentHealth == 0 || nextLevel == 25) {
+            if (currentHealth == 0 || nextLevel >= 25) {
                 tete.destroy();
                 this.dollars.destroy();
             } else {
@@ -384,14 +541,19 @@ class jeu2 extends Phaser.Scene {
                         tete.rotation += 0.1;
                 }
 
-                var vitesseTete = userInBdd.vitesseEnMoins + 3 + levelNiveau - 10;
-                if( vitesseTete < 3 )
-                    vitesseTete = 3;
                 tete.y += vitesseTete;
 
-                if (tete.y > game.config.height) {
-                    if( tete.teteOver != teteWanted )
-                        currentHealth = 0;
+                if (tete.y > game.config.height && tete.visible == true ) {
+                    if( tete.teteOver != teteWanted ) {
+                        if( this.vies > 0){
+                            this.vies--;
+                            this.life[0].visible = false;
+                            this.life.shift();
+                            tete.y = tete.departY;
+                        }else {
+                            currentHealth = 0;
+                        }
+                    }
                     else
                         tete.y = tete.departY;
 
@@ -399,10 +561,15 @@ class jeu2 extends Phaser.Scene {
             }
         }
 
-        if( this.dollars.direction == 0 )
-            this.dollars.x -= 6 + levelNiveau;
-        else
-            this.dollars.x += 6 + levelNiveau;
+        var vitesseDollars = userInBdd.vitesseEnMoins + 6 + levelNiveau - 10;
+        if( vitesseDollars < 5)
+            vitesseDollars = 5;
+        if( this.dollars.direction == 0 ){
+            this.dollars.x -= vitesseDollars;
+        }
+        else {
+            this.dollars.x += vitesseDollars;
+        }
 
         if(  this.pepite && this.pepite.direction == 0 )
             this.pepite.x -= 7;
@@ -443,10 +610,6 @@ class jeu2 extends Phaser.Scene {
 
         if (augmente <= -60)
             positif = 1;
-
-    }
-
-    changeTete(imgFalse){
 
     }
 

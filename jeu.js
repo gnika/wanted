@@ -54,7 +54,7 @@ class jeu extends Phaser.Scene {
                 if( userInBdd.level < 10 )
                     this.scene.start("map");
                 else
-                    this.scene.start("map2");
+                    this.scene.start("map3");
             });
         iconReturn.visible = false;
         decor.setInteractive();
@@ -84,12 +84,16 @@ class jeu extends Phaser.Scene {
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
                      pepites,
-                    userInBdd.entreeChariot
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite,
+                    userInBdd.vie,
+                    userInBdd.onetouchtwomatch
                 );
                 if( userInBdd.level < 10 )
                     this.scene.start("map");
                 else
-                    this.scene.start("map2");
+                    this.scene.start("map3");
             }
         });
 
@@ -320,7 +324,11 @@ class jeu extends Phaser.Scene {
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
                     0,
-                    userInBdd.entreeChariot
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite,
+                    userInBdd.vie,
+                    userInBdd.onetouchtwomatch
                 );
                 this.emitterDollars.on = false;
                 pepiteDisplay.setText(0);
@@ -431,9 +439,9 @@ class jeu extends Phaser.Scene {
             this.teteWanted.x += vitesseTete;
 
         if( this.dollars.direction == 0 )
-            this.dollars.x -= 6 + levelNiveau;
+            this.dollars.x -= userInBdd.vitesseEnMoins + 6 + levelNiveau;
         else
-            this.dollars.x += 6 + levelNiveau;
+            this.dollars.x += userInBdd.vitesseEnMoins + 6 + levelNiveau;
 
         if(  this.pepite && this.pepite.direction == 0 )
             this.pepite.x -= 7;

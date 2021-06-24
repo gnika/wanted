@@ -3,26 +3,11 @@ class MainScene extends Phaser.Scene    {
     constructor(){
         super({
             key: 'MainScene',
-            pack: {
-                files: [{
-                    type: 'plugin',
-                    key: 'rexwebfontloaderplugin',
-                    url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexwebfontloaderplugin.min.js',
-                    start: true
-                }]
-            }
-            });
+        });
     }
-    preload () {
-        this.plugins.get('rexwebfontloaderplugin').addToScene(this);
-        var WebFontConfig = {
-            google: {
-                families: ['Luckiest Guy']
-            }
-        };
 
-        this.load.rexWebFont(WebFontConfig);
-        this.load.image('decors', 'assets/images/decors/street.png');
+    preload () {
+        this.load.image('decors', 'assets/images/decors/street.jpg');
         this.load.image('return', 'assets/images/return.png');
         this.load.image('menu1', 'assets/images/main/menu1.png');
         this.load.image('menu2', 'assets/images/main/menu2.png');
@@ -55,7 +40,7 @@ class MainScene extends Phaser.Scene    {
           //  pageItemCount: 3
         //})
 
-        const decors = this.add.image(400, 300, 'decors');
+        const decors = this.add.image(400, 500, 'decors');
         this.tweens.add({
             targets: decors,
             x: 100,
@@ -88,8 +73,15 @@ class MainScene extends Phaser.Scene    {
         });
 
         this.cameras.main.on('camerafadeoutcomplete', function () {
+            if( userInBdd.level < 10)
+                this.scene.start("map");
+            else if( userInBdd.level > 10 && userInBdd.level < 20 )
+                this.scene.start("map2");
+            else if( userInBdd.level > 20 && userInBdd.level < 30 )
+                this.scene.start("map3");
+            else if( userInBdd.level > 30 )
+                this.scene.start("map4");
 
-            this.scene.start("map");
 
         }, this);
 
@@ -134,7 +126,51 @@ class MainScene extends Phaser.Scene    {
 
                 this.clickButton4 = this.add.text(screenCenterX /2 + 110, screenCenterY + 120, 'RANK', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
                     .setInteractive()
-                    .on('pointerdown', () => this.scene.start("leaderboard"))
+                    .on('pointerdown', () => {
+
+                        const dbRef = firebase.database().ref();
+                        dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
+                            if (snapshot.exists()) {
+                                userInBdd = snapshot.val();
+                            } else {
+                                //on créé l'utilisateur
+                                writeUserData(
+                                    userConnected.uid,
+                                    userConnected.displayName,
+                                    userConnected.email,
+                                    userConnected.photoURL,
+                                    0,//level
+                                    0,//score
+                                    0,//entreeSaloon
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0,
+                                    0
+                                );
+                                userInBdd        = userConnected;
+                                userInBdd.level  = 0;
+                                userInBdd.score  = 0;
+                                userInBdd.entreeSaloon  = 0;
+                                userInBdd.timeAdd  = 0;
+                                userInBdd.recompenseAdd  = 0;
+                                userInBdd.vitesseEnMoins  = 0;
+                                userInBdd.pepite  = 0;
+                                userInBdd.entreeChariot  = 0;
+                                userInBdd.entreeMagasin2  = 0;
+                                userInBdd.dynamite  = 0;
+                                userInBdd.vie  = 0;
+                                userInBdd.onetouchtwomatch  = 0;
+                            }
+                        }).catch((error) => {
+                            console.error(error);
+                        });
+                        this.scene.start("leaderboard")
+                    })
                     .on('pointerover', () => this.enterButtonHoverState(this.clickButton4))
                     .on('pointerout', () => this.enterButtonRestState(this.clickButton4));
 
@@ -145,6 +181,7 @@ class MainScene extends Phaser.Scene    {
         });
 
          //raccourci pour aller directement aux scenes que l'on code
+        /*
         var iconReturn = this.add.image(game.config.width - 200, game.config.height - 250, 'return').setInteractive()
             .on('pointerdown', () => {
                 const dbRef = firebase.database().ref();
@@ -165,6 +202,10 @@ class MainScene extends Phaser.Scene    {
                             0,
                             0,
                             0,
+                            0,
+                            0,
+                            0,
+                            0,
                             0
                         );
                         userInBdd        = userConnected;
@@ -176,12 +217,17 @@ class MainScene extends Phaser.Scene    {
                         userInBdd.vitesseEnMoins  = 0;
                         userInBdd.pepite  = 0;
                         userInBdd.entreeChariot  = 0;
+                        userInBdd.entreeMagasin2  = 0;
+                        userInBdd.dynamite  = 0;
+                        userInBdd.vie  = 0;
+                        userInBdd.onetouchtwomatch  = 0;
                     }
                 }).catch((error) => {
                     console.error(error);
                 });
-                this.scene.start("map2");
+                this.scene.start("map3");
             });
+            */
 
 
     }
@@ -239,6 +285,10 @@ class MainScene extends Phaser.Scene    {
               0,
                0,
                     0,
+                    0,
+                    0,
+                    0,
+                    0,
                     0
                 );
                 userInBdd        = userConnected;
@@ -250,6 +300,10 @@ class MainScene extends Phaser.Scene    {
                 userInBdd.vitesseEnMoins  = 0;
                 userInBdd.pepite  = 0;
                 userInBdd.entreeChariot  = 0;
+                userInBdd.entreeMagasin2  = 0;
+                userInBdd.dynamite  = 0;
+                userInBdd.vie  = 0;
+                userInBdd.onetouchtwomatch  = 0;
             }
         }).catch((error) => {
             console.error(error);

@@ -1,10 +1,10 @@
 
 
 
-class shop extends Phaser.Scene {
+class shop4 extends Phaser.Scene {
     constructor() {
         super({
-            key: 'shop'
+            key: 'shop4'
         });
     }
 
@@ -14,6 +14,8 @@ class shop extends Phaser.Scene {
         this.load.image('pepite', 'assets/images/pepite.png');
         this.load.image('pepite_mini', 'assets/images/tetes/pepite.png');
         this.load.image('time', 'assets/images/time.png');
+        this.load.image('sherif_mini', 'assets/images/shop/sherif_mini.png');
+        this.load.image('dynamite_mini', 'assets/images/shop/dynamite_mini.png');
         this.load.image('wanted_mini', 'assets/images/wanted/wanted_mini.png');
         this.load.image('gold_mini', 'assets/images/gold_mini.png');
         this.load.image('tete1_mini', 'assets/images/tetes/tete1_mini.png');
@@ -23,7 +25,6 @@ class shop extends Phaser.Scene {
     }
 
     create() {
-        this.effetAchat = 0;
         this.add.image(400, 350, 'fondboard');
         this.add.image(400, 750, 'fondboard');
 
@@ -37,21 +38,21 @@ class shop extends Phaser.Scene {
         var r1 = this.add.rectangle(400, 300, 480, 80, 0XB45F06 );
         var r2 = this.add.rectangle(400, 400, 480, 80, 0XB45F06 );
         var r3 = this.add.rectangle(400, 500, 480, 80, 0XB45F06 );
-        var r4 = this.add.rectangle(400, 600, 480, 80, 0XB45F06 );
+        //var r4 = this.add.rectangle(400, 600, 480, 80, 0XB45F06 );
 
         //premiere ligne
-        this.timeAdd = this.add.text(170, 280, '+ 5 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.add.image(280, 300, 'time');
+        this.timeAdd = this.add.text(170, 280, '+ 1 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(280, 300, 'sherif_mini');
 
-        this.costAdd = this.add.text(380, 270, '5 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.costAdd = this.add.text(380, 270, '7 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(440, 300, 'pepite_mini');
 
-        this.timeAcuel = this.add.text(500, 270, 50 + userInBdd.timeAdd, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.timeAcuel = this.add.text(500, 270, userInBdd.vie, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
 
 
-        if( userInBdd.timeAdd < 50 )
+        if( userInBdd.vie < 5 )
             this.achat1 = this.add.text(600, 250, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
-            .on('pointerdown', () => this.achat('time'))
+            .on('pointerdown', () => this.achat('vie'))
             .on('pointerover', () => this.enterButtonHoverState(this.achat1))
             .on('pointerout', () => this.enterButtonRestState(this.achat1));
 
@@ -59,18 +60,16 @@ class shop extends Phaser.Scene {
 
 
         //deuxieme ligne
-        this.timeAdd = this.add.text(157, 380, '+25', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
-        this.add.image(245, 400, 'gold_mini');
-        this.timeAdd = this.add.text(270, 380, '/', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.add.image(335, 400, 'wanted_mini');
+        this.timeAdd = this.add.text(157, 380, '+1 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 42})
+        this.add.image(265, 400, 'dynamite_mini');
 
-        this.costReward = this.add.text(380, 370, '3 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.costReward = this.add.text(380, 370, '7 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(440, 400, 'pepite_mini');
 
-        this.rewardAcuel = this.add.text(500, 370, userInBdd.recompenseAdd, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        if( userInBdd.recompenseAdd < 250 )
+        this.rewardAcuel = this.add.text(500, 370, userInBdd.dynamite, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        if( userInBdd.dynamite < 5 )
             this.achat2 = this.add.text(600, 350, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
-                .on('pointerdown', () => this.achat('reward'))
+                .on('pointerdown', () => this.achat('dynamite'))
                 .on('pointerover', () => this.enterButtonHoverState(this.achat2))
                 .on('pointerout', () => this.enterButtonRestState(this.achat2));
 
@@ -80,11 +79,11 @@ class shop extends Phaser.Scene {
         this.timeAdd = this.add.text(161, 480, 'Slower', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 32})
         this.add.image(325, 500, 'tete1_mini');
 
-        this.costVitesse = this.add.text(380, 470, '5 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.costVitesse = this.add.text(380, 470, '9 ', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(440, 500, 'pepite_mini');
 
         this.vitesseAcuel = this.add.text(500, 470, userInBdd.vitesseEnMoins, {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        if( userInBdd.vitesseEnMoins > -5 )
+        if( userInBdd.vitesseEnMoins > -12 )
             this.achat3 = this.add.text(600, 450, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
                 .on('pointerdown', () => this.achat('vitesse'))
                 .on('pointerover', () => this.enterButtonHoverState(this.achat3))
@@ -92,16 +91,20 @@ class shop extends Phaser.Scene {
 
 
         //quatrieme ligne
-        this.timeAdd = this.add.text(161, 570, '- 1000', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
-        this.add.image(360, 600, 'gold_mini');
-        this.timeAdd = this.add.text(431, 570, '+ 5', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        /*
+        this.timeAdd = this.add.text(161, 570, '1 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(230, 600, 'tete1_mini');
+        this.timeAdd = this.add.text(260, 570, ' = 2 ', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
+        this.add.image(370, 600, 'tete1_mini');
+        this.add.text(430, 570, '15', {fill: 'yellow', fontFamily: "Luckiest Guy", fontSize: 52})
         this.add.image(525, 600, 'pepite_mini');
 
+        if( userInBdd.onetouchtwomatch == 0 )
         this.achat4 = this.add.text(600, 550, '+', {fill: 'green', fontFamily: "Luckiest Guy", fontSize: 75}).setInteractive()
-            .on('pointerdown', () => this.achat('echange'))
+            .on('pointerdown', () => this.achat('onetouchtwomatch'))
             .on('pointerover', () => this.enterButtonHoverState(this.achat4))
             .on('pointerout', () => this.enterButtonRestState(this.achat4));
-
+*/
         this.levelDone = this.add.text(700, 450, '- 1', {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 52})
         this.levelDoneImg = this.add.image(700, 550, 'level_done');
 
@@ -117,7 +120,7 @@ class shop extends Phaser.Scene {
         var pepite = this.add.image(50, this.cameras.main.height -50, 'pepite');
 
         var iconReturn = this.add.image(600, 800, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("map"));
+            .on('pointerdown', () => this.scene.start("map4"));
 
 
 
@@ -145,6 +148,7 @@ class shop extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
+        /*
         this.tweens.add({
             targets: r4,
             alpha: 0.2,
@@ -152,6 +156,8 @@ class shop extends Phaser.Scene {
             repeat: 0,
             ease: 'Sine.easeInOut'
         });
+
+         */
 
 
 
@@ -173,35 +179,8 @@ class shop extends Phaser.Scene {
         var enoughMonney = 1;
         var enoughGold   = 1;
 
-        if( attribut == 'time'){
+        if( attribut == 'vie'){
             if (userInBdd.pepite >= 5) {
-                writeUserData(
-                    userConnected.uid,
-                    userConnected.displayName,
-                    userConnected.email,
-                    userConnected.photoURL,
-                    userInBdd.level,
-                    userInBdd.score,
-                    userInBdd.entreeSaloon,
-                    userInBdd.timeAdd + 5,
-                    userInBdd.recompenseAdd,
-                    userInBdd.vitesseEnMoins,
-                    userInBdd.pepite - 5,
-                    userInBdd.entreeChariot,
-                    userInBdd.entreeMagasin2,
-                    userInBdd.dynamite,
-                    userInBdd.vie,
-                    userInBdd.onetouchtwomatch
-                );
-                pepiteDisplay.setText(userInBdd.pepite);
-                this.timeAcuel.setText(userInBdd.timeAdd + 50);
-                if( userInBdd.timeAdd >= 50 )
-                    this.achat1.destroy();
-            }else enoughMonney = 0;
-        }
-
-        if( attribut == 'reward'){
-            if ( userInBdd.pepite >= 3 ) {
                 writeUserData(
                     userConnected.uid,
                     userConnected.displayName,
@@ -211,24 +190,51 @@ class shop extends Phaser.Scene {
                     userInBdd.score,
                     userInBdd.entreeSaloon,
                     userInBdd.timeAdd,
-                    userInBdd.recompenseAdd + 25,
+                    userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
-                    userInBdd.pepite - 3,
+                    userInBdd.pepite - 7,
                     userInBdd.entreeChariot,
                     userInBdd.entreeMagasin2,
                     userInBdd.dynamite,
+                    userInBdd.vie+1,
+                    userInBdd.onetouchtwomatch
+                );
+                pepiteDisplay.setText(userInBdd.pepite);
+                this.timeAcuel.setText(userInBdd.vie);
+                if( userInBdd.vie >= 5 )
+                    this.achat1.destroy();
+            }else enoughMonney = 0;
+        }
+
+        if( attribut == 'dynamite'){
+            if ( userInBdd.pepite >= 7 ) {
+                writeUserData(
+                    userConnected.uid,
+                    userConnected.displayName,
+                    userConnected.email,
+                    userConnected.photoURL,
+                    userInBdd.level,
+                    userInBdd.score,
+                    userInBdd.entreeSaloon,
+                    userInBdd.timeAdd,
+                    userInBdd.recompenseAdd,
+                    userInBdd.vitesseEnMoins,
+                    userInBdd.pepite - 7,
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite +1,
                     userInBdd.vie,
                     userInBdd.onetouchtwomatch
                 );
                 pepiteDisplay.setText(userInBdd.pepite);
-                this.rewardAcuel.setText(userInBdd.recompenseAdd);
-                if( userInBdd.recompenseAdd >= 250 )
+                this.rewardAcuel.setText(userInBdd.dynamite);
+                if( userInBdd.dynamite >= 5 )
                     this.achat2.destroy();
             }else enoughMonney = 0;
         }
 
         if( attribut == 'vitesse'){
-            if (userInBdd.pepite >= 5) {
+            if (userInBdd.pepite >= 7) {
                 writeUserData(
                     userConnected.uid,
                     userConnected.displayName,
@@ -240,7 +246,7 @@ class shop extends Phaser.Scene {
                     userInBdd.timeAdd,
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins - 1,
-                    userInBdd.pepite - 5,
+                    userInBdd.pepite - 9,
                     userInBdd.entreeChariot,
                     userInBdd.entreeMagasin2,
                     userInBdd.dynamite,
@@ -249,17 +255,16 @@ class shop extends Phaser.Scene {
                 );
                 pepiteDisplay.setText(userInBdd.pepite);
                 this.vitesseAcuel.setText(userInBdd.vitesseEnMoins);
-                if( userInBdd.vitesseEnMoins <= -5 )
+                if( userInBdd.vitesseEnMoins <= -12 )
                     this.achat3.destroy();
             }else enoughMonney = 0;
         }
 
-        if( attribut == 'echange'){
+        if( attribut == 'onetouchtwomatch'){
 
-            if (userInBdd.score >= 1000) {
+            if (userInBdd.pepite >= 15) {
 
 
-                this.effetAchat = 1;
                 var newLevel = userInBdd.level - 1;
 
                 if( newLevel < 0 )
@@ -271,21 +276,21 @@ class shop extends Phaser.Scene {
                     userConnected.email,
                     userConnected.photoURL,
                     newLevel,
-                    userInBdd.score - 1000,
+                    userInBdd.score,
                     userInBdd.entreeSaloon,
                     userInBdd.timeAdd,
                     userInBdd.recompenseAdd,
                     userInBdd.vitesseEnMoins,
-                    userInBdd.pepite + 5,
+                    userInBdd.pepite - 15,
                     userInBdd.entreeChariot,
                     userInBdd.entreeMagasin2,
                     userInBdd.dynamite,
                     userInBdd.vie,
-                    userInBdd.onetouchtwomatch
+                    userInBdd.onetouchtwomatch +1
                 );
-                this.scoreDisplay.setText(userInBdd.score);
+                this.achat4.destroy();
                 pepiteDisplay.setText(userInBdd.pepite);
-            }else enoughGold = 0;
+            }else enoughMonney = 0;
         }
 
         if ( enoughMonney == 0 ) {
@@ -300,37 +305,9 @@ class shop extends Phaser.Scene {
                 loop: false
             });
         }
-
-        if ( enoughGold == 0 ) {
-            this.scoreDisplay.setStyle({fill: 'red'})
-            this.scoreDisplay.setFontSize(60);
-            this.time.addEvent({
-                delay: 300,
-                callback: () => {
-                    this.scoreDisplay.setFontSize(52);
-                    this.scoreDisplay.setStyle({fill: cssColors.yellow})
-                },
-                loop: false
-            });
-        }
     }
 
     update() {
-        if( this.effetAchat == 1 ){
-            this.levelDone.visible = true;
-            this.levelDoneImg.visible = true;
-
-            this.levelDone.y = this.levelDone.y+1;
-
-            this.levelDoneImg.y = this.levelDoneImg.y+1;
-            if( this.levelDone.y >= this.levelDone.originY + 50 ){
-                this.effetAchat = 0;
-                this.levelDone.visible = false;
-                this.levelDoneImg.visible = false;
-                this.levelDone.y = this.levelDone.originY;
-                this.levelDoneImg.y = this.levelDoneImg.originY;
-            }
-        }
 
     }
 }

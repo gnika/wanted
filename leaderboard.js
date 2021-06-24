@@ -9,16 +9,17 @@ class leaderboard extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('fondboard', 'images/boardgame/fondboard.png');
+        this.load.image('fondboard', 'assets/images/boardgame/fond.jpg');
         this.load.image('return', 'assets/images/return.png');
     }
 
     create() {
-        var decor = this.add.image(400, 400, 'fondboard');
-        var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
+        var decor = this.add.image(400, 500, 'fondboard');
+        var iconReturn = this.add.image(game.config.width - 100, game.config.height - 250, 'return').setInteractive()
             .on('pointerdown', () => this.scene.start("MainScene"));
         var starCountRef = firebase.database().ref('users').orderByChild('score');
-        this.texts = [];
+        var place = 1;
+        var stopCounting = 0;
         starCountRef.on('value', (snapshot) => {
 
             this.usersBoard = [];
@@ -29,10 +30,26 @@ class leaderboard extends Phaser.Scene {
                 this.usersBoard.push(childData);
             });
             this.usersBoard.reverse();
-            for(var i =0; i < this.texts.length; i++){
-                this.texts[i].destroy();
-            }
             this.texts = [];
+
+            for(var i =0; i < this.usersBoard.length; i++){
+
+                if( this.usersBoard[i].username.length > 0) {
+
+                    if (this.usersBoard[i].username == userInBdd.username) {
+                        stopCounting = 1;
+                    }
+                }
+                if( stopCounting == 0 )
+                    place ++;
+            }
+
+            this.add.text(
+                100,
+                100,
+                'You are '+place+' on '+this.usersBoard.length+' with the score : '+userInBdd.score,
+                {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 25});
+
 
             for(var i =0; i < 10; i++){//this.usersBoard.length
                 var textAdd = this.add.text(

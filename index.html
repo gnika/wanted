@@ -22,6 +22,8 @@
     var cssColors        = colors.cssColors;
     var currentHealth    = 50;
     var maxHealth        = 100;
+    teteBonus            = 0;
+    bonusTete            = 0;
     userConnected        = null;
     timedEvent           = null;
     nbBandit             = 0;
@@ -66,7 +68,7 @@
                     gravity: { y: 200 }
                 }
             },
-            scene: [MainScene, jeu, jeu2, map, map2, map3, wanted, wanted2, leaderboard, saloon, shop]
+            scene: [intro, MainScene, jeu, jeu2, map, map2, map3, map4, wanted, wanted2, leaderboard, saloon, shop, shop2, shop3, shop4]
         };
 
         game= new Phaser.Game(config);
@@ -76,16 +78,21 @@
 
 
 </script>
+    <script type="text/javascript" src="intro.js"></script>
     <script type="text/javascript" src="MainScene.js"></script>
     <script type="text/javascript" src="map.js"></script>
     <script type="text/javascript" src="map2.js"></script>
     <script type="text/javascript" src="map3.js"></script>
+    <script type="text/javascript" src="map4.js"></script>
     <script type="text/javascript" src="leaderboard.js"></script>
     <script type="text/javascript" src="wanted.js"></script>
     <script type="text/javascript" src="wanted2.js"></script>
     <script type="text/javascript" src="jeu.js"></script>
     <script type="text/javascript" src="jeu2.js"></script>
     <script type="text/javascript" src="shop.js"></script>
+    <script type="text/javascript" src="shop2.js"></script>
+    <script type="text/javascript" src="shop3.js"></script>
+    <script type="text/javascript" src="shop4.js"></script>
     <script type="text/javascript" src="saloon.js"></script>
     <script type="text/javascript" src="functions.js"></script>
 </head>
