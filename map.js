@@ -358,7 +358,7 @@ class map extends Phaser.Scene {
             .on('pointerover', () => this.chariot.visible = false);
 
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
-            .on('pointerdown', () => this.scene.start("MainScene"));
+            .on('pointerdown', () => {music.destroy(); this.scene.start("MainScene")});
 
         currentHealth = 50 + userInBdd.timeAdd;
         nextLevel     = 0;

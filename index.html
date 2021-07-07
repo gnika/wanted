@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="manifest" href="manifest.json" />
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/@samme/colors@1.2.0/dist/colors.umd.js"></script>
 
@@ -10,18 +11,14 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
 
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-
-    <script>
-
-    </script>
-
 <script>
     var text, timer, nextLevelText;
     var cssColors        = colors.cssColors;
     var currentHealth    = 50;
     var maxHealth        = 100;
+    isMute               = 0;
+    music                = '';
+    clock                = '';
     teteBonus            = 0;
     bonusTete            = 0;
     userConnected        = null;
@@ -72,8 +69,6 @@
         };
 
         game= new Phaser.Game(config);
-        //  game.scene.start("shop");
-        //game.scene.start("map");
     };
 
 

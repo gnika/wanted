@@ -138,6 +138,9 @@ function actionDollars  () { //quand on clique sur les dollars
     this.dollars.visible = false;
     this.emitterDollars.on = false;
 
+    bonus = this.sound.add('bonus');
+    bonus.play();
+
     grossirText = scoreDisplay;
 
     dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
@@ -197,6 +200,9 @@ function actionPepite  () { //quand on clique sur les dollars
     this.catchPepite = 1;
     this.pepite.visible = false;
     this.emitterPepite.on = false;
+
+    bonus = this.sound.add('bonus');
+    bonus.play();
 
     grossirText = pepiteDisplay;
 

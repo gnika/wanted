@@ -12,11 +12,16 @@ class MainScene extends Phaser.Scene    {
         this.load.image('menu1', 'assets/images/main/menu1.png');
         this.load.image('menu2', 'assets/images/main/menu2.png');
         this.load.image('menu3', 'assets/images/main/menu3.png');
+        this.load.image('musicButton', 'assets/images/music.png');
         this.load.image('jeu', 'assets/images/jeu.png');
+        this.load.audio('theme', 'assets/music/music1.mp3');
+        this.load.audio('pistol', 'assets/music/pistol.mp3');
 
     }
     create () {
-
+        music = this.sound.add('theme');
+        music.loop = true;
+        music.play();
         // Your web app's Firebase configuration
         var firebaseConfig = {
             apiKey: "AIzaSyCbHGEAhnqMtcJbpYU9jdjqc75bnGO23-Y",
@@ -41,6 +46,19 @@ class MainScene extends Phaser.Scene    {
         //})
 
         const decors = this.add.image(400, 500, 'decors');
+        const musicButton = this.add.image(this.cameras.main.width - 50, 50, 'musicButton').setInteractive()
+            .on('pointerdown', () => {
+                if( isMute == 0 ) {
+                    musicButton.setTint(0xff0000);
+                    game.sound.setMute(true);
+                    isMute = 1;
+                }else{
+                    musicButton.clearTint();
+                    isMute = 0;
+                    game.sound.setMute(false);
+                }
+            } );
+
         this.tweens.add({
             targets: decors,
             x: 100,
@@ -75,11 +93,11 @@ class MainScene extends Phaser.Scene    {
         this.cameras.main.on('camerafadeoutcomplete', function () {
             if( userInBdd.level < 10)
                 this.scene.start("map");
-            else if( userInBdd.level > 10 && userInBdd.level < 20 )
+            else if( userInBdd.level >= 10 && userInBdd.level < 20 )
                 this.scene.start("map2");
-            else if( userInBdd.level > 20 && userInBdd.level < 30 )
+            else if( userInBdd.level >= 20 && userInBdd.level < 30 )
                 this.scene.start("map3");
-            else if( userInBdd.level > 30 )
+            else if( userInBdd.level >= 30 )
                 this.scene.start("map4");
 
 
@@ -88,7 +106,8 @@ class MainScene extends Phaser.Scene    {
         this.time.addEvent({
             delay: 3000,                // 3000 ms
             callback: ()=>{
-
+                var pistol = this.sound.add('pistol');
+                pistol.play();
                 let sign = this.add.image(400, 100, 'jeu');
 
                     this.tweens.add({
@@ -238,6 +257,7 @@ class MainScene extends Phaser.Scene    {
     deconnect(sceneContext) {
         firebaseApp.auth().signOut();
         userConnected = null;
+        music.destroy();
         sceneContext.restart();
     }
 
@@ -250,6 +270,7 @@ class MainScene extends Phaser.Scene    {
             var user = result.user;
             // ...
             if( user != null ) {
+                music.destroy();
                 sceneContext.restart();
             }
         }).catch(function (error) {

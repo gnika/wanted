@@ -29,17 +29,15 @@ class intro extends Phaser.Scene    {
         const decors = this.add.image(400, 500, 'intro');
 
         //  Get a random color
-        var red = Phaser.Math.Between(50, 255);
-        var green = Phaser.Math.Between(50, 255);
-        var blue = Phaser.Math.Between(50, 255);
-
-        this.cameras.main.fade(3000, red, green, blue);
-        this.cameras.main.on('camerafadeoutcomplete', function () {
-
-            this.scene.start("MainScene");
-        }, this);
 
 
+        this.time.addEvent({
+            delay: 2000,
+            loop: false,
+            callback: () => {
+                this.scene.start("MainScene");
+            }
+        })
 
 
     }

@@ -83,7 +83,7 @@ class map3 extends Phaser.Scene {
                         }),
 
                         content:
-                            this.add.text(0, 0, '45000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
+                            this.add.text(0, 0, '65000 gold to enter', {fontSize: '24px', fontFamily: "Luckiest Guy"})
 
                         ,
 
@@ -119,14 +119,14 @@ class map3 extends Phaser.Scene {
                         .on('button.click', function (button, groupName, index) {
                             //this.print.text += index + ': ' + button.text + '\n';
                             if (index == 0) {//yes
-                                if (userInBdd.score >= 45000) {
+                                if (userInBdd.score >= 65000) {
                                     writeUserData(
                                         userConnected.uid,
                                         userConnected.displayName,
                                         userConnected.email,
                                         userConnected.photoURL,
                                         userInBdd.level,
-                                        userInBdd.score - 40000,
+                                        userInBdd.score - 65000,
                                         userInBdd.entreeSaloon,
                                         userInBdd.timeAdd,
                                         userInBdd.recompenseAdd,

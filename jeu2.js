@@ -36,6 +36,9 @@ class jeu2 extends Phaser.Scene {
         this.load.image('dynamite', 'assets/images/dynamite.png');
         this.load.image('sherif', 'assets/images/sherif.png');
         this.load.image('interdit', 'assets/images/interdit.png');
+        this.load.audio('bonus', 'assets/music/bonus.wav');
+        this.load.audio('wrong', 'assets/music/wrong.mp3');
+        this.load.audio('clock', 'assets/music/clock.mp3');
         this.load.spritesheet('button', 'assets/buttons/button_sprite_sheet.png', {
             frameWidth: 193,
             frameHeight: 71
@@ -47,6 +50,12 @@ class jeu2 extends Phaser.Scene {
 
     create() {
 
+        clock = this.sound.add('clock');
+        clock.loop = true;
+        clock.play();
+        if( isMute == 0 )
+            game.sound.setMute(false);
+
         //on passe par la pour les dollars car il ne doit pas réapparaitre tout de suite
         this.emitterEventDollars = new Phaser.Events.EventEmitter();
         this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
@@ -57,11 +66,16 @@ class jeu2 extends Phaser.Scene {
         var graphics = this.add.graphics();
         graphics.fillGradientStyle(0xffff00, 0xffff00, 0xff0000, 0xff0000, 1);
         graphics.fillRect(0, 700, game.config.width, 400);
+
+
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
             .on('pointerdown', () => {
-                if( userInBdd.level < 20 )
+                clock.stop();
+                if( userInBdd.level >= 10 && userInBdd.level < 20 )
                     this.scene.start("map2");
-                else
+                else if( userInBdd.level >= 20 && userInBdd.level < 30 )
+                    this.scene.start("map3");
+                else if( userInBdd.level >= 30 )
                     this.scene.start("map4");
             });
         iconReturn.visible = false;
@@ -112,11 +126,14 @@ class jeu2 extends Phaser.Scene {
                     userInBdd.vie,
                     userInBdd.onetouchtwomatch
                 );
-                if (userInBdd.level == 0)
+                clock.stop();
+                if( userInBdd.level < 10)
                     this.scene.start("map");
-                else if( userInBdd.level < 20 )
+                else if( userInBdd.level >= 10 && userInBdd.level < 20 )
                     this.scene.start("map2");
-                else
+                else if( userInBdd.level >= 20 && userInBdd.level < 30 )
+                    this.scene.start("map3");
+                else if( userInBdd.level >= 30 )
                     this.scene.start("map4");
             }
         });
@@ -157,7 +174,7 @@ class jeu2 extends Phaser.Scene {
         this.emitterDollars.startFollow(this.dollars);
 ////////////////////
         this.catchPepite = 0;//ajout de la pépite seulement si le niveau est fini
-            this.time.addEvent({    //Apparition des pepites, une seule par partie
+        this.time.addEvent({    //Apparition des pepites, une seule par partie
             delay: Phaser.Math.Between(3000, 10000),
             //delay: Phaser.Math.Between(3000, 3001),
             callback: () => {
@@ -236,12 +253,22 @@ class jeu2 extends Phaser.Scene {
 
             this.tetes[a].on('pointerdown', function () {         //quand on clique sur une tete
 
-                    var tete = this;
+                var tete = this;
 
-                if( this.teteOver == teteWanted )
+                if( this.teteOver == teteWanted ) {
                     currentHealth = 0;
-                if( this.teteOver == 'tete'+bonusTete )
-                    teteBonus ++;
+                    var wrong = game.sound.add('wrong');
+                    wrong.play();
+                }
+                else if( this.teteOver == 'tete'+bonusTete ) {
+
+                    var bonus = game.sound.add('bonus');
+                    bonus.play();
+                    teteBonus++;
+                }else{
+                    var pistol = game.sound.add('pistol');
+                    pistol.play();
+                }
 
                 if( userInBdd.onetouchtwomatch == 1 ) { //on en prends 2 pour 1 mais ca n'incremente pas les pv les bonus et l'argent
                     var next = tete.number + 1;
@@ -332,7 +359,7 @@ class jeu2 extends Phaser.Scene {
                             userInBdd.onetouchtwomatch
                         );
 
-                }, callbackScope: this});
+                    }, callbackScope: this});
 
 
             });
@@ -357,6 +384,8 @@ class jeu2 extends Phaser.Scene {
 
             this.dynamite[a].on('pointerdown', function () {         //quand on clique sur une dynamite
 
+                var bonus = game.sound.add('bonus');
+                bonus.play();
 
                 var findSpark = mainGame.particlesFind.createEmitter({
                     speed: 100,

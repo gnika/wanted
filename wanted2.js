@@ -24,7 +24,7 @@ class wanted2 extends Phaser.Scene {
     }
 
     create() {
-
+        game.sound.setMute(true);
         var tetRechercheeNumber  = Phaser.Math.Between(1, 4);//A MODIFIER SELON LE NOMBRE DE TETE DISPOS
         var toutesLesTetes = [1, 2, 3, 4];//A MODIFIER SELON LE NOMBRE DE TETE DISPOS
 

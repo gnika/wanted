@@ -11,6 +11,9 @@ class jeu extends Phaser.Scene {
         //this.load.setBaseURL('http://labs.phaser.io');
 
         this.load.image('sky', 'assets/skies/space3.png');
+        this.load.audio('clock', 'assets/music/clock.mp3');
+        this.load.audio('wrong', 'assets/music/wrong.mp3');
+        this.load.audio('bonus', 'assets/music/bonus.wav');
         this.load.image('fond1', 'assets/images/decors/fond1.jpg');
         this.load.image('fond2', 'assets/images/decors/fond2.jpg');
         this.load.image('fond3', 'assets/images/decors/fond3.jpg');
@@ -43,6 +46,12 @@ class jeu extends Phaser.Scene {
 
     create() {
 
+        clock = this.sound.add('clock');
+        clock.loop = true;
+        clock.play();
+        if( isMute == 0 )
+            game.sound.setMute(false);
+
         //on passe par la pour les dollars car il ne doit pas réapparaitre tout de suite
         this.emitterEventDollars = new Phaser.Events.EventEmitter();
         this.emitterEventDollars.on('restartDollars', this.restartDollars, this);
@@ -51,51 +60,24 @@ class jeu extends Phaser.Scene {
         var decor = this.add.image(400, 400, 'fond'+fond);
         var iconReturn = this.add.image(game.config.width - 100, game.config.height - 50, 'return').setInteractive()
             .on('pointerdown', () => {
-                if( userInBdd.level < 10 )
+                if( userInBdd.level < 10)
                     this.scene.start("map");
-                else
+                else if( userInBdd.level >= 10 && userInBdd.level < 20 )
+                    this.scene.start("map2");
+                else if( userInBdd.level >= 20 && userInBdd.level < 30 )
                     this.scene.start("map3");
+                else if( userInBdd.level >= 30 )
+                    this.scene.start("map4");
             });
         iconReturn.visible = false;
         decor.setInteractive();
-        decor.on('pointerdown', () => {        //quand on clique sur l'élément PAS recherché
-            if( currentHealth > 0 && nextLevel < 10 )
-                this.time.addEvent({callback: badClick, callbackScope: this});
-            else{
-                var pepiteBonus = Math.trunc(currentHealth / 10);
-                var scoreBonus = Math.trunc(currentHealth / 10) * 10;
-                if( this.catchPepite == 1 ){
-                    var pepites = userInBdd.pepite + this.catchPepite + pepiteBonus;
-                    var score = userInBdd.score;
-                }else{
-                    var pepites = userInBdd.pepite;
-                    var score = userInBdd.score + scoreBonus;
-                }
+        decor.on('pointerdown', () => this.actionFalse());
 
-                writeUserData(
-                    userConnected.uid,
-                    userConnected.displayName,
-                    userConnected.email,
-                    userConnected.photoURL,
-                    userInBdd.level,
-                    score,
-                    userInBdd.entreeSaloon,
-                    userInBdd.timeAdd,
-                    userInBdd.recompenseAdd,
-                    userInBdd.vitesseEnMoins,
-                     pepites,
-                    userInBdd.entreeChariot,
-                    userInBdd.entreeMagasin2,
-                    userInBdd.dynamite,
-                    userInBdd.vie,
-                    userInBdd.onetouchtwomatch
-                );
-                if( userInBdd.level < 10 )
-                    this.scene.start("map");
-                else
-                    this.scene.start("map3");
-            }
-        });
+        var graphics = this.add.graphics();
+        graphics.fillGradientStyle(0xffff00, 0xffff00, 0xff0000, 0xff0000, 1);
+        graphics.fillRect(0, 700, game.config.width, 400);
+        graphics.setInteractive(new Phaser.Geom.Rectangle(0, 700, game.config.width, 400), Phaser.Geom.Rectangle.Contains)
+            .on('pointerdown', () => this.actionFalse());
 
 
         var particles = this.add.particles('red');
@@ -127,8 +109,11 @@ class jeu extends Phaser.Scene {
                 .setCollideWorldBounds(true)
                 .setInteractive()
                 .on('pointerdown', () => {        //quand on clique sur le bandit game over direct
-                    if( nextLevel < 10 )
+                    if( nextLevel < 10 ) {
                         currentHealth = 0;
+                        var wrong = this.sound.add('wrong');
+                        wrong.play();
+                    }
             });
         }
 
@@ -147,6 +132,8 @@ class jeu extends Phaser.Scene {
         this.teteWanted.setInteractive();
 
         this.teteWanted.on('pointerdown', () => {        //quand on clique sur l'élément recherché
+            var pistol = this.sound.add('pistol');
+            pistol.play();
             this.time.addEvent({callback: actionOnClick, callbackScope: this});
         });
 
@@ -308,6 +295,57 @@ class jeu extends Phaser.Scene {
 
     }
 
+    actionFalse(){
+        {        //quand on clique sur l'élément PAS recherché
+
+
+
+            if( currentHealth > 0 && nextLevel < 10 ) {
+                var wrong = this.sound.add('wrong');
+                wrong.play();
+                this.time.addEvent({callback: badClick, callbackScope: this});
+            }
+            else{
+                var pepiteBonus = Math.trunc(currentHealth / 10);
+                var scoreBonus = Math.trunc(currentHealth / 10) * 10;
+                if( this.catchPepite == 1 ){
+                    var pepites = userInBdd.pepite + this.catchPepite + pepiteBonus;
+                    var score = userInBdd.score;
+                }else{
+                    var pepites = userInBdd.pepite;
+                    var score = userInBdd.score + scoreBonus;
+                }
+
+                writeUserData(
+                    userConnected.uid,
+                    userConnected.displayName,
+                    userConnected.email,
+                    userConnected.photoURL,
+                    userInBdd.level,
+                    score,
+                    userInBdd.entreeSaloon,
+                    userInBdd.timeAdd,
+                    userInBdd.recompenseAdd,
+                    userInBdd.vitesseEnMoins,
+                    pepites,
+                    userInBdd.entreeChariot,
+                    userInBdd.entreeMagasin2,
+                    userInBdd.dynamite,
+                    userInBdd.vie,
+                    userInBdd.onetouchtwomatch
+                );
+                clock.stop();
+                if( userInBdd.level < 10)
+                    this.scene.start("map");
+                else if( userInBdd.level >= 10 && userInBdd.level < 20 )
+                    this.scene.start("map2");
+                else if( userInBdd.level >= 20 && userInBdd.level < 30 )
+                    this.scene.start("map3");
+                else if( userInBdd.level >= 30 )
+                    this.scene.start("map4");
+            }
+        }
+    }
 
     update() {
         if (currentHealth == 0) {
