@@ -41,8 +41,8 @@ class MainScene extends Phaser.Scene    {
 
         //leaderboard = firestore pas database : https://phaser.discourse.group/t/plugin-leaderboard-error/9691/6
         //var leaderBoard = this.plugins.get('rexfirebaseplugin').add.leaderBoard({
-          //  root: 'users',
-          //  pageItemCount: 3
+        //  root: 'users',
+        //  pageItemCount: 3
         //})
 
         const decors = this.add.image(400, 500, 'decors');
@@ -110,12 +110,12 @@ class MainScene extends Phaser.Scene    {
                 pistol.play();
                 let sign = this.add.image(400, 100, 'jeu');
 
-                    this.tweens.add({
-                        targets: sign,
-                        y: 160,
-                        ease: 'Bounce.easeOut',
-                        duration: 1000
-                    });
+                this.tweens.add({
+                    targets: sign,
+                    y: 160,
+                    ease: 'Bounce.easeOut',
+                    duration: 1000
+                });
 
                 this.add.image(screenCenterX, screenCenterY - 165, 'menu1');
                 this.add.image(screenCenterX, screenCenterY +160, 'menu3');
@@ -148,46 +148,48 @@ class MainScene extends Phaser.Scene    {
                     .on('pointerdown', () => {
 
                         const dbRef = firebase.database().ref();
-                        dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
-                            if (snapshot.exists()) {
-                                userInBdd = snapshot.val();
-                            } else {
-                                //on créé l'utilisateur
-                                writeUserData(
-                                    userConnected.uid,
-                                    userConnected.displayName,
-                                    userConnected.email,
-                                    userConnected.photoURL,
-                                    0,//level
-                                    0,//score
-                                    0,//entreeSaloon
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0,
-                                    0
-                                );
-                                userInBdd        = userConnected;
-                                userInBdd.level  = 0;
-                                userInBdd.score  = 0;
-                                userInBdd.entreeSaloon  = 0;
-                                userInBdd.timeAdd  = 0;
-                                userInBdd.recompenseAdd  = 0;
-                                userInBdd.vitesseEnMoins  = 0;
-                                userInBdd.pepite  = 0;
-                                userInBdd.entreeChariot  = 0;
-                                userInBdd.entreeMagasin2  = 0;
-                                userInBdd.dynamite  = 0;
-                                userInBdd.vie  = 0;
-                                userInBdd.onetouchtwomatch  = 0;
-                            }
-                        }).catch((error) => {
-                            console.error(error);
-                        });
+                        if( userConnected != null ) {
+                            dbRef.child("users").child(userConnected.uid).get().then((snapshot) => {
+                                if (snapshot.exists()) {
+                                    userInBdd = snapshot.val();
+                                } else {
+                                    //on créé l'utilisateur
+                                    writeUserData(
+                                        userConnected.uid,
+                                        userConnected.displayName,
+                                        userConnected.email,
+                                        userConnected.photoURL,
+                                        0,//level
+                                        0,//score
+                                        0,//entreeSaloon
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0,
+                                        0
+                                    );
+                                    userInBdd        = userConnected;
+                                    userInBdd.level  = 0;
+                                    userInBdd.score  = 0;
+                                    userInBdd.entreeSaloon  = 0;
+                                    userInBdd.timeAdd  = 0;
+                                    userInBdd.recompenseAdd  = 0;
+                                    userInBdd.vitesseEnMoins  = 0;
+                                    userInBdd.pepite  = 0;
+                                    userInBdd.entreeChariot  = 0;
+                                    userInBdd.entreeMagasin2  = 0;
+                                    userInBdd.dynamite  = 0;
+                                    userInBdd.vie  = 0;
+                                    userInBdd.onetouchtwomatch  = 0;
+                                }
+                            }).catch((error) => {
+                                console.error(error);
+                            });
+                        }
                         this.scene.start("leaderboard")
                     })
                     .on('pointerover', () => this.enterButtonHoverState(this.clickButton4))
@@ -199,7 +201,7 @@ class MainScene extends Phaser.Scene    {
             loop: false
         });
 
-         //raccourci pour aller directement aux scenes que l'on code
+        //raccourci pour aller directement aux scenes que l'on code
         /*
         var iconReturn = this.add.image(game.config.width - 200, game.config.height - 250, 'return').setInteractive()
             .on('pointerdown', () => {
@@ -299,12 +301,12 @@ class MainScene extends Phaser.Scene    {
                     userConnected.displayName,
                     userConnected.email,
                     userConnected.photoURL,
-                     0,//level
-                     0,//score
-                0,//entreeSaloon
-                   0,
-              0,
-               0,
+                    0,//level
+                    0,//score
+                    0,//entreeSaloon
+                    0,
+                    0,
+                    0,
                     0,
                     0,
                     0,

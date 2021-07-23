@@ -33,31 +33,36 @@ class leaderboard extends Phaser.Scene {
             this.texts = [];
 
             for(var i =0; i < this.usersBoard.length; i++){
-
-                if( this.usersBoard[i].username.length > 0) {
-
-                    if (this.usersBoard[i].username == userInBdd.username) {
-                        stopCounting = 1;
+                if( userInBdd != null ){
+                    if( this.usersBoard[i].username.length > 0) {
+                        console.log(this.usersBoard[i].username, userInBdd.username);
+                        if (this.usersBoard[i].username == userInBdd.username) {
+                            stopCounting = 1;
+                        }
                     }
                 }
                 if( stopCounting == 0 )
                     place ++;
             }
 
-            this.add.text(
-                100,
-                100,
-                'You are '+place+' on '+this.usersBoard.length+' with the score : '+userInBdd.score,
-                {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 25});
+            if( userInBdd != null ){
+                this.add.text(
+                    100,
+                    100,
+                    'You are '+place+' on '+this.usersBoard.length+' with the score : '+userInBdd.score,
+                    {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 25});
+            }
 
 
             for(var i =0; i < 10; i++){//this.usersBoard.length
-                var textAdd = this.add.text(
-                    100,
-                    200 + 50*i,
-                    (i+1)+' - '+this.usersBoard[i].username+' - score : '+this.usersBoard[i].score,
-                    {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 25});
-                this.texts.push(textAdd);
+                if( this.usersBoard[i] != null ){
+                    var textAdd = this.add.text(
+                        100,
+                        200 + 50*i,
+                        (i+1)+' - '+this.usersBoard[i].username+' - score : '+this.usersBoard[i].score,
+                        {fill: 'brown', fontFamily: "Luckiest Guy", fontSize: 25});
+                    this.texts.push(textAdd);
+                }
             }
         });
 
